@@ -119,7 +119,8 @@ class Deprecated
         $message = $subject . ' is deprecated';
 
         if ($since !== null) {
-            $message .= sprintf(' since %.1f and will be removed in %s.0', $since, ((string) $since)[0] + 1);
+            $since = (string) $since;
+            $message .= sprintf(' since %.1f and will be removed in %s.0', $since, $since[0] + 1);
         }
 
         $message .= '.';
