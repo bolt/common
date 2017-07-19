@@ -61,6 +61,13 @@ class StrTest extends TestCase
     {
         $this->assertSame('herp', Str::splitFirst('herp derp terp lerp', ' '));
         $this->assertSame('herp derp', Str::splitFirst('herp derp', ','));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSplitFirstEmptyDelimiter()
+    {
         $this->assertFalse(Str::splitFirst('herp derp', ''));
     }
 
@@ -68,6 +75,13 @@ class StrTest extends TestCase
     {
         $this->assertSame('lerp', Str::splitLast('herp derp terp lerp', ' '));
         $this->assertSame('herp derp', Str::splitLast('herp derp', ','));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSplitLastEmptyDelimiter()
+    {
         $this->assertFalse(Str::splitLast('herp derp', ''));
     }
 
