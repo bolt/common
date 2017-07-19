@@ -74,19 +74,16 @@ class Str
 
     /**
      * Splits a $subject on the $delimiter and returns the first part.
-     * If delimiter is empty false is returned.
      * If the delimiter is not found in the string the string is returned.
      *
      * @param string $subject   The string to split
      * @param string $delimiter The term to split on
      *
-     * @return string|bool
+     * @return string
      */
     public static function splitFirst($subject, $delimiter)
     {
-        if (empty($delimiter)) {
-            return false;
-        }
+        Assert::notEmpty($delimiter);
 
         $parts = explode($delimiter, $subject, 2);
 
@@ -95,19 +92,16 @@ class Str
 
     /**
      * Splits a $subject on the $delimiter and returns the last part.
-     * If delimiter is empty false is returned.
      * If the delimiter is not found in the string the string is returned.
      *
      * @param string $subject   The string to split
      * @param string $delimiter The term to split on
      *
-     * @return string|bool
+     * @return string
      */
     public static function splitLast($subject, $delimiter)
     {
-        if (empty($delimiter)) {
-            return false;
-        }
+        Assert::notEmpty($delimiter);
 
         $parts = explode($delimiter, $subject);
 
