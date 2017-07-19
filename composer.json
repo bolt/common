@@ -10,10 +10,12 @@
     ],
     "require": {
         "php": "^5.5 || ^7.0",
+        "seld/jsonlint": "^1.4",
         "symfony/polyfill-php71": "^1.0",
         "webmozart/assert": "^1.2"
     },
     "require-dev": {
+        "lstrojny/phpunit-function-mocker": "0.3.0",
         "phpunit/phpunit": "^4.8",
         "symfony/phpunit-bridge": "^3.3"
     },
