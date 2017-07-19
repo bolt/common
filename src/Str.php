@@ -79,6 +79,8 @@ class Str
      * @param string $subject   The string to split
      * @param string $delimiter The term to split on
      *
+     * @throws \InvalidArgumentException
+     *
      * @return string
      */
     public static function splitFirst($subject, $delimiter)
@@ -96,6 +98,8 @@ class Str
      *
      * @param string $subject   The string to split
      * @param string $delimiter The term to split on
+     *
+     * @throws \InvalidArgumentException
      *
      * @return string
      */
