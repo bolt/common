@@ -46,4 +46,20 @@ class Assert extends \Webmozart\Assert\Assert
             ));
         }
     }
+
+    /**
+     * Convert the given value to a string representation.
+     *
+     * This returns the class name of objects instead of `object`.
+     * This returns quoted string values instead of `string`.
+     * This returns `false` or `true` instead of `boolean`.
+     *
+     * @param mixed $value
+     *
+     * @return string
+     */
+    public static function valueToString($value)
+    {
+        return parent::valueToString($value);
+    }
 }
