@@ -92,18 +92,6 @@ Deprecated::cls('Foo\Bar', null, 'Bar\Baz');
 ```
 
 
-### `service($name, $since = null, $suggest = '')`
-
-Shortcut for triggering a deprecation warning for a DI service.
-
-```php
-use Bolt\Common\Deprecated;
-
-// Triggers warning: "Accessing container service 'foo' is deprecated since 3.3 and will be removed in 4.0. Use 'bar' service instead."
-Deprecated::service('foo', 3.3, 'bar');
-```
-
-
 ### `warn($subject, $since = null, $suggest = '')`
 
 Shortcut for triggering a deprecation warning for a subject.
