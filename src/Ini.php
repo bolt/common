@@ -75,6 +75,34 @@ class Ini
     }
 
     /**
+     * Parses a bytes string representation value of the given key and returns it as an int.
+     *
+     * Note that floats are converted to ints before being multiplied by their unit. Thus 5.5M == 5M and 0.5M == 0.
+     *
+     * @param string   $key
+     * @param int|null $default
+     *
+     * @return int|null
+     */
+    public static function getBytes($key, $default = null)
+    {
+        $value = ini_get($key);
+
+        if ($value === false || $value === '') {
+            return $default;
+        }
+
+        if ($value === '-1') {
+            return -1;
+        }
+
+        $unit = preg_replace('/[^bkmgtpezy]/i', '', $value);
+        $size = preg_replace('/[^0-9\.]/', '', $value);
+
+        return ((int) $size) * ($unit ? pow(1024, stripos('bkmgtpezy', $unit[0])) : 1);
+    }
+
+    /**
      * Set a new value for the given key.
      *
      * @param string $key

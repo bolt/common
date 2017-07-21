@@ -10,6 +10,7 @@ class IniTest extends TestCase
     const STR_KEY = 'session.save_path';
     const BOOL_KEY = 'assert.bail';
     const INT_KEY = 'precision';
+    const BYTES_KEY = 'memory_limit';
     const READ_ONLY_KEY = 'allow_url_fopen';
     const TRIGGERS_ERROR_KEY = 'session.name';
     const NONEXISTENT_KEY = 'herp.derp';
@@ -19,9 +20,10 @@ class IniTest extends TestCase
     protected function setUp()
     {
         $this->backup = [
-            static::STR_KEY  => ini_get(static::STR_KEY),
-            static::BOOL_KEY => ini_get(static::BOOL_KEY),
-            static::INT_KEY  => ini_get(static::INT_KEY),
+            static::STR_KEY   => ini_get(static::STR_KEY),
+            static::BOOL_KEY  => ini_get(static::BOOL_KEY),
+            static::INT_KEY   => ini_get(static::INT_KEY),
+            static::BYTES_KEY => ini_get(static::BYTES_KEY),
         ];
     }
 
@@ -75,6 +77,39 @@ class IniTest extends TestCase
         $this->assertSame(4.0, Ini::getNumeric(static::INT_KEY, 4.0));
 
         $this->assertNull(Ini::getNumeric(static::NONEXISTENT_KEY));
+    }
+
+    public function provideBytes()
+    {
+        return [
+            ['500000', 500000],
+            ['5K', 5120],
+            ['5k', 5120],
+            ['5KB', 5120],
+            ['5kb', 5120],
+            ['5.5K', 5120],
+            ['0.25M', 0],
+            ['5M', 5242880],
+            ['5G', 5368709120],
+            ['-1', -1],
+            ['', null],
+            [null, null, self::NONEXISTENT_KEY]
+        ];
+    }
+
+    /**
+     * @dataProvider provideBytes
+     *
+     * @param string|null $value
+     * @param mixed       $expected
+     * @param string      $key
+     */
+    public function testGetBytes($value, $expected, $key = self::BYTES_KEY)
+    {
+        if ($value !== null) {
+            Ini::set($key, $value);
+        }
+        $this->assertSame($expected, Ini::getBytes($key));
     }
 
     public function testSet()
