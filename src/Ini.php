@@ -120,8 +120,9 @@ class Ini
             $ex = new \ErrorException($message, 0, $severity, $file, $line);
         });
 
+        $iniValue = $value === false ? '0' : (string) $value;
         try {
-            $result = ini_set($key, $value === false ? '0' : $value);
+            $result = ini_set($key, $iniValue);
         } finally {
             restore_error_handler();
         }
@@ -134,6 +135,12 @@ class Ini
                 throw new \RuntimeException(sprintf('Unable to change ini option "%s", because it is not editable at runtime.', $key, $value), 0, $ex);
             }
 
+            $value = Assert::valueToString($value);
+            throw new \RuntimeException(sprintf('Unable to change ini option "%s" to %s.', $key, $value), 0, $ex);
+        }
+
+        // HHVM sets values w/o error, but the change is not actually applied.
+        if (ini_get($key) !== $iniValue) {
             $value = Assert::valueToString($value);
             throw new \RuntimeException(sprintf('Unable to change ini option "%s" to %s.', $key, $value), 0, $ex);
         }

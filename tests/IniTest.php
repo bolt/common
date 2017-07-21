@@ -7,23 +7,26 @@ use PHPUnit\Framework\TestCase;
 
 class IniTest extends TestCase
 {
-    const STR_KEY = 'session.save_path';
+    const STR_KEY = 'user_agent';
     const BOOL_KEY = 'assert.bail';
-    const INT_KEY = 'precision';
+    const NUMERIC_KEY = 'date.default_latitude';
     const BYTES_KEY = 'memory_limit';
+    const VALIDATED_KEY = 'precision';
+
     const READ_ONLY_KEY = 'allow_url_fopen';
     const TRIGGERS_ERROR_KEY = 'session.name';
     const NONEXISTENT_KEY = 'herp.derp';
+    const SILENT_ERROR_KEY = 'session.gc_maxlifetime';
 
     private $backup;
 
     protected function setUp()
     {
         $this->backup = [
-            static::STR_KEY   => ini_get(static::STR_KEY),
-            static::BOOL_KEY  => ini_get(static::BOOL_KEY),
-            static::INT_KEY   => ini_get(static::INT_KEY),
-            static::BYTES_KEY => ini_get(static::BYTES_KEY),
+            static::STR_KEY     => ini_get(static::STR_KEY),
+            static::BOOL_KEY    => ini_get(static::BOOL_KEY),
+            static::NUMERIC_KEY => ini_get(static::NUMERIC_KEY),
+            static::BYTES_KEY   => ini_get(static::BYTES_KEY),
         ];
     }
 
@@ -42,11 +45,11 @@ class IniTest extends TestCase
 
     public function testGetStr()
     {
-        ini_set(static::STR_KEY, 'foo');
-        $this->assertSame('foo', Ini::getStr(static::STR_KEY));
-
         ini_set(static::STR_KEY, '');
         $this->assertSame('default', Ini::getStr(static::STR_KEY, 'default'));
+
+        ini_set(static::STR_KEY, 'foo');
+        $this->assertSame('foo', Ini::getStr(static::STR_KEY));
 
         $this->assertNull(Ini::getStr(static::NONEXISTENT_KEY));
     }
@@ -67,14 +70,16 @@ class IniTest extends TestCase
 
     public function testGetNumeric()
     {
-        ini_set(static::INT_KEY, '2');
-        $this->assertSame(2, Ini::getNumeric(static::INT_KEY));
+        if (!defined('HHVM_VERSION')) {
+            ini_set(static::NUMERIC_KEY, '');
+            $this->assertSame(4.0, Ini::getNumeric(static::NUMERIC_KEY, 4.0));
+        }
 
-        ini_set(static::INT_KEY, '3.2');
-        $this->assertSame(3.2, Ini::getNumeric(static::INT_KEY));
+        ini_set(static::NUMERIC_KEY, '2');
+        $this->assertSame(2, Ini::getNumeric(static::NUMERIC_KEY));
 
-        ini_set(static::INT_KEY, '');
-        $this->assertSame(4.0, Ini::getNumeric(static::INT_KEY, 4.0));
+        ini_set(static::NUMERIC_KEY, '3.2');
+        $this->assertSame(3.2, Ini::getNumeric(static::NUMERIC_KEY));
 
         $this->assertNull(Ini::getNumeric(static::NONEXISTENT_KEY));
     }
@@ -134,21 +139,44 @@ class IniTest extends TestCase
             'ini values must be scalar or null. Got: array'
         );
 
-        Ini::set(static::INT_KEY, []);
+        Ini::set(static::NUMERIC_KEY, []);
     }
 
     public function testSetInvalidValue()
     {
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped('HHVM does not disallow this.');
+        }
+
         $this->setExpectedException(
             \RuntimeException::class,
-            sprintf('Unable to change ini option "%s" to -2.', static::INT_KEY)
+            sprintf('Unable to change ini option "%s" to -2.', static::VALIDATED_KEY)
         );
 
-        Ini::set(static::INT_KEY, -2);
+        Ini::set(static::VALIDATED_KEY, -2);
+    }
+
+    public function testSetInvalidValueSilentError()
+    {
+        // PHP allows setting floats on int keys, HHVM does not.
+        if (!defined('HHVM_VERSION')) {
+            return;
+        }
+
+        $this->setExpectedException(
+            \RuntimeException::class,
+            sprintf('Unable to change ini option "%s" to 5.5.', static::SILENT_ERROR_KEY)
+        );
+
+        Ini::set(static::SILENT_ERROR_KEY, 5.5);
     }
 
     public function testSetInvalidValueErrorTriggered()
     {
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped('HHVM does not trigger error.');
+        }
+
         try {
             Ini::set(static::TRIGGERS_ERROR_KEY, '');
             $this->fail('Exception should be thrown');
