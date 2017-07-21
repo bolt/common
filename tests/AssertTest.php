@@ -72,4 +72,9 @@ class AssertTest extends TestCase
     {
         Assert::isIterable(new \stdClass());
     }
+
+    public function testValueToString()
+    {
+        $this->assertSame('"foo"', Assert::valueToString('foo'));
+    }
 }
