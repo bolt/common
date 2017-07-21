@@ -65,16 +65,6 @@ class DeprecatedTest extends TestCase
         $this->assertDeprecation('Foo\Bar is deprecated. Do it this way instead.');
     }
 
-    public function testService()
-    {
-        Deprecated::service('foo');
-        $this->assertDeprecation("Accessing container service 'foo' is deprecated.");
-        Deprecated::service('foo', null, 'bar');
-        $this->assertDeprecation("Accessing container service 'foo' is deprecated. Use 'bar' service instead.");
-        Deprecated::service('foo', null, 'Do it this way instead.');
-        $this->assertDeprecation("Accessing container service 'foo' is deprecated. Do it this way instead.");
-    }
-
     public function testWarn()
     {
         Deprecated::warn('Foo bar');

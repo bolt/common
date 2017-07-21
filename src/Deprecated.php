@@ -84,25 +84,6 @@ class Deprecated
     }
 
     /**
-     * Shortcut for triggering a deprecation warning for a DI service.
-     *
-     * Example:
-     *     Deprecated::service('foo', 3.3, 'bar'); // triggers warning: "Accessing container service 'foo' is deprecated since 3.3 and will be removed in 4.0. Use 'bar' service instead."
-     *
-     * @param string     $name    The service that is deprecated.
-     * @param float|null $since   The version it was deprecated in.
-     * @param string     $suggest A service name or suggestion of what to use instead.
-     */
-    public static function service($name, $since = null, $suggest = '')
-    {
-        if ($suggest && preg_match('/\s/', $suggest) === 0) {
-            $suggest = sprintf("Use '%s' service instead.", $suggest);
-        }
-
-        static::warn(sprintf("Accessing container service '%s'", $name), $since, $suggest);
-    }
-
-    /**
      * Shortcut for triggering a deprecation warning for a subject.
      *
      * Example:
