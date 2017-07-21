@@ -38,10 +38,15 @@ class IniTest extends TestCase
         $this->assertFalse(Ini::has(static::NONEXISTENT_KEY));
     }
 
-    public function testGet()
+    public function testGetStr()
     {
-        $this->assertSame(ini_get(static::STR_KEY), Ini::get(static::STR_KEY));
-        $this->assertNull(Ini::get(static::NONEXISTENT_KEY));
+        ini_set(static::STR_KEY, 'foo');
+        $this->assertSame('foo', Ini::getStr(static::STR_KEY));
+
+        ini_set(static::STR_KEY, '');
+        $this->assertSame('default', Ini::getStr(static::STR_KEY, 'default'));
+
+        $this->assertNull(Ini::getStr(static::NONEXISTENT_KEY));
     }
 
     public function testGetBool()
@@ -49,11 +54,13 @@ class IniTest extends TestCase
         ini_set(static::BOOL_KEY, '0');
         $this->assertFalse(Ini::getBool(static::BOOL_KEY));
 
+        ini_set(static::BOOL_KEY, '');
+        $this->assertFalse(Ini::getBool(static::BOOL_KEY));
+
         ini_set(static::BOOL_KEY, '1');
         $this->assertTrue(Ini::getBool(static::BOOL_KEY));
 
-
-        $this->assertNull(Ini::getBool(static::NONEXISTENT_KEY));
+        $this->assertFalse(Ini::getBool(static::NONEXISTENT_KEY));
     }
 
     public function testGetNumeric()
@@ -63,6 +70,9 @@ class IniTest extends TestCase
 
         ini_set(static::INT_KEY, '3.2');
         $this->assertSame(3.2, Ini::getNumeric(static::INT_KEY));
+
+        ini_set(static::INT_KEY, '');
+        $this->assertSame(4.0, Ini::getNumeric(static::INT_KEY, 4.0));
 
         $this->assertNull(Ini::getNumeric(static::NONEXISTENT_KEY));
     }

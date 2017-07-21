@@ -29,37 +29,38 @@ class Ini
     }
 
     /**
-     * Returns the value of the given key or the given default if it does not exist.
+     * Returns the string value of the given key or the given default if it is empty or does not exist.
      *
-     * @param string     $key
-     * @param mixed|null $default
+     * @param string      $key
+     * @param string|null $default
      *
-     * @return mixed
+     * @return string|null
      */
-    public static function get($key, $default = null)
+    public static function getStr($key, $default = null)
     {
         $value = ini_get($key);
 
-        return $value === false ? $default : $value;
+        return $value === false || $value === '' ? $default : $value;
     }
 
     /**
-     * Returns the value of the given key filtered to a boolean or the given default if it does not exist.
+     * Returns the value of the given key filtered to a boolean.
      *
-     * @param string    $key
-     * @param bool|null $default
+     * If the key does not exist false is returned.
      *
-     * @return bool|null
+     * @param string $key
+     *
+     * @return bool
      */
-    public static function getBool($key, $default = null)
+    public static function getBool($key)
     {
-        $value = static::get($key, $default);
-
-        return $value !== null ? filter_var($value, FILTER_VALIDATE_BOOLEAN) : null;
+        return filter_var(ini_get($key), FILTER_VALIDATE_BOOLEAN);
     }
 
     /**
-     * Returns the value of the given key filtered to an int or float or the given default if it does not exist.
+     * Returns the value of the given key filtered to an int or float.
+     *
+     * If the key does not exist or the value is empty the given default is returned.
      *
      * @param string         $key
      * @param int|float|null $default
@@ -68,9 +69,9 @@ class Ini
      */
     public static function getNumeric($key, $default = null)
     {
-        $value = static::get($key, $default);
+        $value = ini_get($key);
 
-        return $value !== null ? $value + 0 : null;
+        return $value === false || $value === '' ? $default : $value + 0;
     }
 
     /**
