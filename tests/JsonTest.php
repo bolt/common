@@ -237,4 +237,23 @@ class JsonTest extends TestCase
             FunctionMocker::tearDown();
         }
     }
+
+    public function testTest()
+    {
+        $this->assertFalse(Json::test(null));
+        $this->assertFalse(Json::test(123));
+        $this->assertTrue(Json::test('{}'));
+        $this->assertTrue(Json::test(new TestStringable('{}')));
+
+        $this->assertFalse(Json::test('{"foo": "bar",}'), 'Invalid JSON should return false');
+    }
+}
+
+class TestStringable
+{
+    private $string;
+
+    public function __construct($string) { $this->string = $string; }
+
+    public function __toString() { return $this->string; }
 }

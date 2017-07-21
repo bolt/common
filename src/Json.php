@@ -68,4 +68,23 @@ final class Json
 
         return $data;
     }
+
+    /**
+     * Return whether the given string is JSON.
+     *
+     * @param mixed $json
+     *
+     * @return bool
+     */
+    public static function test($json)
+    {
+        if (!is_string($json) && !is_callable([$json, '__toString'])) {
+            return false;
+        }
+
+        // Don't call our parse(), because we don't need the extra syntax checking.
+        @json_decode((string) $json);
+
+        return json_last_error() === JSON_ERROR_NONE;
+    }
 }
