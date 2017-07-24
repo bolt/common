@@ -77,8 +77,10 @@ class Deprecated
     public static function cls($class, $since = null, $suggest = null)
     {
         if ($suggest && preg_match('/\s/', $suggest) === 0) {
-            $suggest = sprintf("Use $suggest instead.", $suggest);
+            $suggest = ltrim($suggest, '\\');
+            $suggest = "Use $suggest instead.";
         }
+        $class = ltrim($class, '\\');
 
         static::warn($class, $since, $suggest);
     }
