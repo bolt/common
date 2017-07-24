@@ -115,14 +115,21 @@ class Ini
     {
         Assert::nullOrScalar($value, 'ini values must be scalar or null. Got: %s');
 
-        $ex = null;
-        set_error_handler(function ($severity, $message, $file, $line) use (&$ex) {
-            $ex = new \ErrorException($message, 0, $severity, $file, $line);
-        });
+        static $handler;
+        if (!$handler) {
+            $handler = function ($severity, $message, $file, $line) {
+                throw new \ErrorException($message, 0, $severity, $file, $line);
+            };
+        }
 
         $iniValue = $value === false ? '0' : (string) $value;
+
+        $result = false;
+        $ex = null;
+        set_error_handler($handler);
         try {
             $result = ini_set($key, $iniValue);
+        } catch (\Exception $ex) {
         } finally {
             restore_error_handler();
         }
