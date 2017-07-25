@@ -1,10 +1,11 @@
 <?php
 
-namespace Gmo\Common\Tests;
+namespace Bolt\Common\Tests;
 
 use Bolt\Common\Exception\DumpException;
 use Bolt\Common\Exception\ParseException;
 use Bolt\Common\Json;
+use Bolt\Common\Tests\Fixtures\TestStringable;
 use PHPUnit\Framework\TestCase;
 use PHPUnit_Extension_FunctionMocker as FunctionMocker;
 
@@ -247,13 +248,4 @@ class JsonTest extends TestCase
 
         $this->assertFalse(Json::test('{"foo": "bar",}'), 'Invalid JSON should return false');
     }
-}
-
-class TestStringable
-{
-    private $string;
-
-    public function __construct($string) { $this->string = $string; }
-
-    public function __toString() { return $this->string; }
 }
