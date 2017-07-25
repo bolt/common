@@ -46,7 +46,7 @@ class StrTest extends TestCase
         $this->assertSame('HelloHelloGoodbye', Str::removeFirst('HelloGoodbyeHelloGoodbye', 'Goodbye'));
         $this->assertSame('HelloHelloGoodbye', Str::removeFirst('HelloGOODBYEHelloGoodbye', 'Goodbye', false));
 
-        $this->assertSame('asdf', Str::removeFirst('asdf', 'zxc'));
+        $this->assertSame('abc', Str::removeFirst('abc', 'zxc'));
     }
 
     public function testRemoveLast()
@@ -54,12 +54,12 @@ class StrTest extends TestCase
         $this->assertSame('HelloGoodbyeGoodbye', Str::removeLast('HelloGoodbyeHelloGoodbye', 'Hello'));
         $this->assertSame('HelloGoodbyeGoodbye', Str::removeLast('HelloGoodbyeHELLOGoodbye', 'Hello', false));
 
-        $this->assertSame('asdf', Str::removeLast('asdf', 'zxc'));
+        $this->assertSame('abc', Str::removeLast('abc', 'zxc'));
     }
 
     public function testSplitFirst()
     {
-        $this->assertSame('herp', Str::splitFirst('herp derp terp lerp', ' '));
+        $this->assertSame('herp', Str::splitFirst('herp derp foo bar', ' '));
         $this->assertSame('herp derp', Str::splitFirst('herp derp', ','));
     }
 
@@ -73,7 +73,7 @@ class StrTest extends TestCase
 
     public function testSplitLast()
     {
-        $this->assertSame('lerp', Str::splitLast('herp derp terp lerp', ' '));
+        $this->assertSame('bar', Str::splitLast('herp derp foo bar', ' '));
         $this->assertSame('herp derp', Str::splitLast('herp derp', ','));
     }
 

@@ -29,7 +29,7 @@ final class Json
         $json = @json_encode($data, $options, $depth);
 
         if ($json === false) {
-            throw new DumpException('JSON dumping failed: ' . json_last_error_msg());
+            throw new DumpException(sprintf('JSON dumping failed: %s', json_last_error_msg()));
         }
 
         return $json;
@@ -56,7 +56,7 @@ final class Json
 
         if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
             if (json_last_error() === JSON_ERROR_UTF8) {
-                throw new ParseException('JSON parsing failed: ' . json_last_error_msg());
+                throw new ParseException(sprintf('JSON parsing failed: %s', json_last_error_msg()));
             }
 
             try {

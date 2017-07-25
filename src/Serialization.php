@@ -17,7 +17,7 @@ class Serialization
      *
      * @param mixed $value
      *
-     * @throws DumpException when serializing fails.
+     * @throws DumpException when serializing fails
      *
      * @return string
      */
@@ -29,7 +29,7 @@ class Serialization
         } catch (\Exception $e) {
         }
 
-        throw new DumpException('Error serializing value. ' . $e->getMessage(), 0, $e);
+        throw new DumpException(sprintf('Error serializing value. %s', $e->getMessage()), 0, $e);
     }
 
     /**
@@ -38,7 +38,7 @@ class Serialization
      * @param string $value
      * @param array  $options
      *
-     * @throws ParseException when unserializing fails.
+     * @throws ParseException when unserializing fails
      *
      * @return mixed
      */
@@ -78,6 +78,6 @@ class Serialization
      */
     public static function handleUnserializeCallback($class)
     {
-        throw new ParseException('Error parsing serialized value. Could not find class: ' . $class);
+        throw new ParseException(sprintf('Error parsing serialized value. Could not find class: %s', $class));
     }
 }

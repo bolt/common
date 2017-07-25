@@ -49,6 +49,7 @@ class TestDeprecatedClass
     }
 }
 
+// @codingStandardsIgnoreLine
 function deprecatedFunction()
 {
     Deprecated::method();

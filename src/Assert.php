@@ -33,7 +33,7 @@ class Assert extends \Webmozart\Assert\Assert
         static::reportInvalidArgument(sprintf(
             $message ?: 'Expected an instance of any of %2$s. Got: %s',
             static::typeToString($value),
-            implode(', ', array_map(array('static', 'valueToString'), $classes))
+            implode(', ', array_map(['static', 'valueToString'], $classes))
         ));
     }
 

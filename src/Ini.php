@@ -108,8 +108,8 @@ class Ini
      * @param string $key
      * @param mixed  $value
      *
-     * @throws \InvalidArgumentException when the value is not scalar or null.
-     * @throws \RuntimeException when the key does not exist, it is not editable, or some unknown reason.
+     * @throws \InvalidArgumentException when the value is not scalar or null
+     * @throws \RuntimeException         when the key does not exist, it is not editable, or some unknown reason
      */
     public static function set($key, $value)
     {
@@ -136,10 +136,18 @@ class Ini
 
         if ($result === false || $ex !== null) {
             if (!static::has($key)) {
-                throw new \RuntimeException(sprintf('The ini option "%s" does not exist. New ini options cannot be added.', $key), 0, $ex);
+                throw new \RuntimeException(
+                    "The ini option '$key' does not exist. New ini options cannot be added.",
+                    0,
+                    $ex
+                );
             }
             if (!static::$keys[$key]) {
-                throw new \RuntimeException(sprintf('Unable to change ini option "%s", because it is not editable at runtime.', $key, $value), 0, $ex);
+                throw new \RuntimeException(
+                    "Unable to change ini option '$key', because it is not editable at runtime.",
+                    0,
+                    $ex
+                );
             }
 
             $value = Assert::valueToString($value);

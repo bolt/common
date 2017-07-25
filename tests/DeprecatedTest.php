@@ -20,10 +20,14 @@ class DeprecatedTest extends TestCase
 
         $realClass = static::class;
         Deprecated::method(3.0, $realClass, 'Foo::bar');
-        $this->assertDeprecation("Foo::bar() is deprecated since 3.0 and will be removed in 4.0. Use $realClass instead.");
+        $this->assertDeprecation(
+            "Foo::bar() is deprecated since 3.0 and will be removed in 4.0. Use $realClass instead."
+        );
 
         Deprecated::method(3.0, 'Do it this way instead.', 'Foo::bar');
-        $this->assertDeprecation('Foo::bar() is deprecated since 3.0 and will be removed in 4.0. Do it this way instead.');
+        $this->assertDeprecation(
+            'Foo::bar() is deprecated since 3.0 and will be removed in 4.0. Do it this way instead.'
+        );
     }
 
     public function testMethodUsingBacktrace()
@@ -34,16 +38,20 @@ class DeprecatedTest extends TestCase
         Fixtures\deprecatedFunction();
         $this->assertDeprecation('Bolt\Common\Tests\Fixtures\deprecatedFunction() is deprecated.');
 
+        /* @noinspection PhpUndefinedMethodInspection */
         TestDeprecatedClass::magicStatic();
         $this->assertDeprecation('Bolt\Common\Tests\Fixtures\TestDeprecatedClass::magicStatic() is deprecated.');
 
         $cls = new TestDeprecatedClass();
+        /* @noinspection PhpUndefinedMethodInspection */
         $cls->magic();
         $this->assertDeprecation('Bolt\Common\Tests\Fixtures\TestDeprecatedClass::magic() is deprecated.');
 
+        /* @noinspection PhpUndefinedFieldInspection */
         $cls->magic;
         $this->assertDeprecation('Getting Bolt\Common\Tests\Fixtures\TestDeprecatedClass::magic is deprecated.');
 
+        /* @noinspection PhpUndefinedFieldInspection */
         $cls->magic = 'derp';
         $this->assertDeprecation('Setting Bolt\Common\Tests\Fixtures\TestDeprecatedClass::magic is deprecated.');
 

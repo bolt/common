@@ -16,10 +16,10 @@ class ParseException extends \RuntimeException
     /**
      * Constructor.
      *
-     * @param string      $message The error message
+     * @param string      $message    The error message
      * @param int         $parsedLine The line where the error occurred
-     * @param string|null $snippet The snippet of code near the problem
-     * @param \Throwable  $previous The previous exception
+     * @param string|null $snippet    The snippet of code near the problem
+     * @param \Throwable  $previous   The previous exception
      */
     public function __construct($message, $parsedLine = -1, $snippet = null, $previous = null)
     {
