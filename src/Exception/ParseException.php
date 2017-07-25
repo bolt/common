@@ -46,7 +46,7 @@ class ParseException extends \RuntimeException
         $line = isset($details['line']) ? $details['line'] : -1;
         $snippet = null;
 
-        if (preg_match("/^Parse error on line (?<line>\\d+):\n(?<snippet>.+)\n.+\n(?<message>.+)$/", $message, $matches)) {
+        if (preg_match("/^Parse error on line (\\d+):\n(.+)\n.+\n(.+)$/", $message, $matches)) {
             $line = (int) $matches[1];
             $snippet = $matches[2];
             $message = $matches[3];
