@@ -16,15 +16,21 @@ matrix:
     - php: hhvm
 
 before_install:
+  # Remove PHP CS Fixer for PHP 5.5 since it requires PHP 5.6
+  - if [[ $TRAVIS_PHP_VERSION == "5.5" || $TRAVIS_PHP_VERSION == "hhvm" ]]; then composer remove friendsofphp/php-cs-fixer --dev --no-update; fi
 
 before_script:
   # Set up Composer
   - composer self-update || true
-  - composer install --prefer-dist
+  - composer install
 
 script:
   # PHPUnit
   - vendor/bin/phpunit
+  # PHP CodeSniffer
+  - vendor/bin/phpcs -p --report=summary
+  # PHP CS Fixer (if >=5.6)
+  - if [[ $TRAVIS_PHP_VERSION != "5.5" && $TRAVIS_PHP_VERSION != "hhvm" ]]; then vendor/bin/php-cs-fixer fix --dry-run; fi
 
 after_script:
 
