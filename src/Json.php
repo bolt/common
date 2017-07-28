@@ -28,11 +28,21 @@ final class Json
     {
         $json = @json_encode($data, $options, $depth);
 
-        if ($json === false) {
-            throw new DumpException(sprintf('JSON dumping failed: %s', json_last_error_msg()), json_last_error());
+        if ($json !== false) {
+            return $json;
         }
 
-        return $json;
+        // If UTF-8 error, try to convert and try again before failing.
+        if (json_last_error() === JSON_ERROR_UTF8) {
+            static::detectAndCleanUtf8($data);
+
+            $json = @json_encode($data, $options, $depth);
+            if ($json !== false) {
+                return $json;
+            }
+        }
+
+        throw new DumpException(sprintf('JSON dumping failed: %s', json_last_error_msg()), json_last_error());
     }
 
     /**
@@ -86,5 +96,51 @@ final class Json
         @json_decode((string) $json);
 
         return json_last_error() === JSON_ERROR_NONE;
+    }
+
+    /**
+     * Detect invalid UTF-8 string characters and convert to valid UTF-8.
+     *
+     * Valid UTF-8 input will be left unmodified, but strings containing
+     * invalid UTF-8 code-points will be re-encoded as UTF-8 with an assumed
+     * original encoding of ISO-8859-15. This conversion may result in
+     * incorrect output if the actual encoding was not ISO-8859-15, but it
+     * will be clean UTF-8 output and will not rely on expensive and fragile
+     * detection algorithms.
+     *
+     * Function converts the input in place in the passed variable so that it
+     * can be used as a callback for array_walk_recursive.
+     *
+     * @param mixed $data Input to check and convert if needed
+     *
+     * @see https://github.com/Seldaek/monolog/pull/683
+     */
+    private static function detectAndCleanUtf8(&$data)
+    {
+        if ($data instanceof \JsonSerializable) {
+            $data = $data->jsonSerialize();
+        } elseif ($data instanceof \ArrayObject || $data instanceof \ArrayIterator) {
+            $data = $data->getArrayCopy();
+        } elseif ($data instanceof \stdClass) {
+            $data = (array) $data;
+        }
+        if (is_array($data)) {
+            array_walk_recursive($data, [static::class, 'detectAndCleanUtf8']);
+
+            return;
+        }
+        if (!is_string($data) || preg_match('//u', $data)) {
+            return;
+        }
+        $data = preg_replace_callback(
+            '/[\x80-\xFF]+/',
+            function ($m) { return utf8_encode($m[0]); },
+            $data
+        );
+        $data = str_replace(
+            ['¤', '¦', '¨', '´', '¸', '¼', '½', '¾'],
+            ['€', 'Š', 'š', 'Ž', 'ž', 'Œ', 'œ', 'Ÿ'],
+            $data
+        );
     }
 }

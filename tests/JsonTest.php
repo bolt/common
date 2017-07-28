@@ -6,6 +6,7 @@ use Bolt\Common\Exception\DumpException;
 use Bolt\Common\Exception\ParseException;
 use Bolt\Common\Json;
 use Bolt\Common\Tests\Fixtures\JsonMocker;
+use Bolt\Common\Tests\Fixtures\TestJsonable;
 use Bolt\Common\Tests\Fixtures\TestStringable;
 use PHPUnit\Framework\TestCase;
 
@@ -215,6 +216,38 @@ class JsonTest extends TestCase
     {
         $data = 'ƌ';
         $this->assertJsonFormat('"\\u018c"', $data, 0);
+    }
+
+    public function testDumpConvertsInvalidEncodingAsLatin9()
+    {
+        $data = "\xA4\xA6\xA8\xB4\xB8\xBC\xBD\xBE";
+        $this->assertJsonFormat('"€ŠšŽžŒœŸ"', $data);
+
+        $data = [
+            'foo' => new TestJsonable([
+                new \ArrayObject(["\xA4"]),
+                new \ArrayIterator(["\xA6"]),
+                (object) ["\xA8"],
+            ]),
+            'bar' => 4,
+        ];
+        $this->assertJsonFormat('{"foo":[["€"],["Š"],["š"]],"bar":4}', $data, JSON_UNESCAPED_UNICODE);
+    }
+
+    public function testDumpThrowsCorrectErrorAfterFixingUtf8Error()
+    {
+        try {
+            Json::dump([["\xA4"]], 448, 1);
+        } catch (DumpException $e) {
+            if ($e->getCode() !== JSON_ERROR_DEPTH) {
+                $this->fail('Should have thrown exception with code for max depth');
+            }
+            $this->assertSame('JSON dumping failed: Maximum stack depth exceeded', $e->getMessage());
+
+            return;
+        }
+
+        $this->fail('Should have thrown ' . DumpException::class);
     }
 
     private function assertJsonFormat($json, $data, $options = null)
