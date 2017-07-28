@@ -4,6 +4,7 @@ namespace Bolt\Common\Tests;
 
 use Bolt\Common\Ini;
 use PHPUnit\Framework\TestCase;
+use PHPUnit_Framework_AssertionFailedError as AssertionFailedError;
 
 class IniTest extends TestCase
 {
@@ -98,7 +99,7 @@ class IniTest extends TestCase
             ['5G', 5368709120],
             ['-1', -1],
             ['', null],
-            [null, null, self::NONEXISTENT_KEY]
+            [null, null, self::NONEXISTENT_KEY],
         ];
     }
 
@@ -179,8 +180,10 @@ class IniTest extends TestCase
 
         try {
             Ini::set(static::TRIGGERS_ERROR_KEY, '');
-            $this->fail('Exception should be thrown');
         } catch (\Exception $e) {
+        }
+        if (!isset($e)) {
+            throw new AssertionFailedError('Exception should be thrown');
         }
 
         $this->assertInstanceOf(
@@ -194,7 +197,7 @@ class IniTest extends TestCase
     {
         $this->setExpectedException(
             \RuntimeException::class,
-            sprintf('The ini option "%s" does not exist. New ini options cannot be added.', static::NONEXISTENT_KEY)
+            sprintf("The ini option '%s' does not exist. New ini options cannot be added.", static::NONEXISTENT_KEY)
         );
 
         Ini::set(static::NONEXISTENT_KEY, 'foo');
@@ -204,7 +207,7 @@ class IniTest extends TestCase
     {
         $this->setExpectedException(
             \RuntimeException::class,
-            sprintf('Unable to change ini option "%s", because it is not editable at runtime.', static::READ_ONLY_KEY)
+            sprintf("Unable to change ini option '%s', because it is not editable at runtime.", static::READ_ONLY_KEY)
         );
 
         Ini::set(static::READ_ONLY_KEY, true);

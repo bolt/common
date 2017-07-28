@@ -1,10 +1,11 @@
 <?php
 
-namespace Gmo\Common\Tests;
+namespace Bolt\Common\Tests;
 
 use Bolt\Common\Exception\DumpException;
 use Bolt\Common\Exception\ParseException;
 use Bolt\Common\Json;
+use Bolt\Common\Tests\Fixtures\TestStringable;
 use PHPUnit\Framework\TestCase;
 use PHPUnit_Extension_FunctionMocker as FunctionMocker;
 
@@ -108,7 +109,12 @@ class JsonTest extends TestCase
     {
         try {
             $result = Json::parse($json);
-            $this->fail(sprintf("Parsing should have failed but didn't.\nExpected:\n\"%s\"\nFor:\n\"%s\"\nGot:\n\"%s\"", $text, $json, var_export($result, true)));
+            $this->fail(sprintf(
+                "Parsing should have failed but didn't.\nExpected:\n\"%s\"\nFor:\n\"%s\"\nGot:\n\"%s\"",
+                $text,
+                $json,
+                var_export($result, true)
+            ));
         } catch (ParseException $e) {
             $this->assertSame($line, $e->getParsedLine());
             $actualMsg = $e->getMessage();
@@ -151,7 +157,7 @@ class JsonTest extends TestCase
 
     public function testDumpEscape()
     {
-        $data = ["Metadata\\\"" => 'src/'];
+        $data = ['Metadata\\"' => 'src/'];
         $json = '{
     "Metadata\\\\\\"": "src/"
 }';
@@ -164,7 +170,7 @@ class JsonTest extends TestCase
             $this->markTestSkipped('Test requires the mbstring extension');
         }
 
-        $data = ["Žluťoučký \" kůň" => "úpěl ďábelské ódy za €"];
+        $data = ['Žluťoučký " kůň' => 'úpěl ďábelské ódy za €'];
         $json = '{
     "Žluťoučký \" kůň": "úpěl ďábelské ódy za €"
 }';
@@ -177,25 +183,25 @@ class JsonTest extends TestCase
             $this->markTestSkipped('Test requires the mbstring extension');
         }
 
-        $data = "\\/ƌ";
+        $data = '\\/ƌ';
         $this->assertJsonFormat('"\\\\\\/ƌ"', $data, JSON_UNESCAPED_UNICODE);
     }
 
     public function testDumpEscapedSlashes()
     {
-        $data = "\\/foo";
+        $data = '\\/foo';
         $this->assertJsonFormat('"\\\\\\/foo"', $data, 0);
     }
 
     public function testDumpEscapedBackslashes()
     {
-        $data = "a\\b";
+        $data = 'a\\b';
         $this->assertJsonFormat('"a\\\\b"', $data, 0);
     }
 
     public function testDumpEscapedUnicode()
     {
-        $data = "ƌ";
+        $data = 'ƌ';
         $this->assertJsonFormat('"\\u018c"', $data, 0);
     }
 
@@ -232,7 +238,7 @@ class JsonTest extends TestCase
         $this->setExpectedException(DumpException::class, 'JSON dumping failed: Unknown error');
 
         try {
-            Json::dump("");
+            Json::dump('');
         } finally {
             FunctionMocker::tearDown();
         }
@@ -247,13 +253,4 @@ class JsonTest extends TestCase
 
         $this->assertFalse(Json::test('{"foo": "bar",}'), 'Invalid JSON should return false');
     }
-}
-
-class TestStringable
-{
-    private $string;
-
-    public function __construct($string) { $this->string = $string; }
-
-    public function __toString() { return $this->string; }
 }

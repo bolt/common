@@ -3,6 +3,7 @@
 namespace Bolt\Common\Tests;
 
 use Bolt\Common\Deprecated;
+use Bolt\Common\Tests\Fixtures\TestDeprecatedClass;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -19,40 +20,48 @@ class DeprecatedTest extends TestCase
 
         $realClass = static::class;
         Deprecated::method(3.0, $realClass, 'Foo::bar');
-        $this->assertDeprecation("Foo::bar() is deprecated since 3.0 and will be removed in 4.0. Use $realClass instead.");
+        $this->assertDeprecation(
+            "Foo::bar() is deprecated since 3.0 and will be removed in 4.0. Use $realClass instead."
+        );
 
         Deprecated::method(3.0, 'Do it this way instead.', 'Foo::bar');
-        $this->assertDeprecation('Foo::bar() is deprecated since 3.0 and will be removed in 4.0. Do it this way instead.');
+        $this->assertDeprecation(
+            'Foo::bar() is deprecated since 3.0 and will be removed in 4.0. Do it this way instead.'
+        );
     }
 
     public function testMethodUsingBacktrace()
     {
         TestDeprecatedClass::foo();
-        $this->assertDeprecation('Bolt\Common\Tests\TestDeprecatedClass::foo() is deprecated.');
+        $this->assertDeprecation('Bolt\Common\Tests\Fixtures\TestDeprecatedClass::foo() is deprecated.');
 
-        deprecatedFunction();
-        $this->assertDeprecation('Bolt\Common\Tests\deprecatedFunction() is deprecated.');
+        Fixtures\deprecatedFunction();
+        $this->assertDeprecation('Bolt\Common\Tests\Fixtures\deprecatedFunction() is deprecated.');
 
+        /* @noinspection PhpUndefinedMethodInspection */
         TestDeprecatedClass::magicStatic();
-        $this->assertDeprecation('Bolt\Common\Tests\TestDeprecatedClass::magicStatic() is deprecated.');
+        $this->assertDeprecation('Bolt\Common\Tests\Fixtures\TestDeprecatedClass::magicStatic() is deprecated.');
 
         $cls = new TestDeprecatedClass();
+        /* @noinspection PhpUndefinedMethodInspection */
         $cls->magic();
-        $this->assertDeprecation('Bolt\Common\Tests\TestDeprecatedClass::magic() is deprecated.');
+        $this->assertDeprecation('Bolt\Common\Tests\Fixtures\TestDeprecatedClass::magic() is deprecated.');
 
+        /* @noinspection PhpUndefinedFieldInspection */
         $cls->magic;
-        $this->assertDeprecation('Getting Bolt\Common\Tests\TestDeprecatedClass::magic is deprecated.');
+        $this->assertDeprecation('Getting Bolt\Common\Tests\Fixtures\TestDeprecatedClass::magic is deprecated.');
 
+        /* @noinspection PhpUndefinedFieldInspection */
         $cls->magic = 'derp';
-        $this->assertDeprecation('Setting Bolt\Common\Tests\TestDeprecatedClass::magic is deprecated.');
+        $this->assertDeprecation('Setting Bolt\Common\Tests\Fixtures\TestDeprecatedClass::magic is deprecated.');
 
         isset($cls->magic);
-        $this->assertDeprecation('isset(Bolt\Common\Tests\TestDeprecatedClass::magic) is deprecated.');
+        $this->assertDeprecation('isset(Bolt\Common\Tests\Fixtures\TestDeprecatedClass::magic) is deprecated.');
         unset($cls->magic);
-        $this->assertDeprecation('unset(Bolt\Common\Tests\TestDeprecatedClass::magic) is deprecated.');
+        $this->assertDeprecation('unset(Bolt\Common\Tests\Fixtures\TestDeprecatedClass::magic) is deprecated.');
 
         new TestDeprecatedClass(true);
-        $this->assertDeprecation('Bolt\Common\Tests\TestDeprecatedClass is deprecated.');
+        $this->assertDeprecation('Bolt\Common\Tests\Fixtures\TestDeprecatedClass is deprecated.');
     }
 
     public function testClass()
@@ -109,54 +118,4 @@ class DeprecatedTest extends TestCase
         $this->assertEquals($msg, $this->deprecations[0]);
         $this->deprecations = [];
     }
-}
-
-class TestDeprecatedClass
-{
-    public function __construct($deprecatedClass = false)
-    {
-        if ($deprecatedClass) {
-            Deprecated::method();
-        }
-    }
-
-    public static function foo()
-    {
-        Deprecated::method();
-    }
-
-    public function __call($name, $arguments)
-    {
-        Deprecated::method();
-    }
-
-    public static function __callStatic($name, $arguments)
-    {
-        Deprecated::method();
-    }
-
-    public function __get($name)
-    {
-        Deprecated::method();
-    }
-
-    public function __set($name, $value)
-    {
-        Deprecated::method();
-    }
-
-    public function __isset($name)
-    {
-        Deprecated::method();
-    }
-
-    public function __unset($name)
-    {
-        Deprecated::method();
-    }
-}
-
-function deprecatedFunction()
-{
-    Deprecated::method();
 }

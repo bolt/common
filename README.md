@@ -2,7 +2,7 @@
 
 This library provides utility functions to help simplify menial tasks.
 
-## `Assert` — Additonal assertions built on `Webmozart\Assert`
+## `Assert` — Additional assertions built on `Webmozart\Assert`
 
 ### `isArrayAccessible($value, $message = '')`
 
