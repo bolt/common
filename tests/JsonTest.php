@@ -127,6 +127,15 @@ class JsonTest extends TestCase
         }
     }
 
+    /**
+     * @expectedException \Bolt\Common\Exception\ParseException
+     * @expectedExceptionMessage JSON parsing failed: Maximum stack depth exceeded
+     */
+    public function testParseErrorDepth()
+    {
+        Json::parse('[[["hi"]]]', 0, 1);
+    }
+
     public function testParseExceptionGettersSetters()
     {
         $ex = new ParseException('Uh oh.');

@@ -55,7 +55,7 @@ final class Json
         $data = @json_decode($json, true, $depth, $options);
 
         if ($data === null && ($code = json_last_error()) !== JSON_ERROR_NONE) {
-            if ($code === JSON_ERROR_UTF8) {
+            if ($code === JSON_ERROR_UTF8 || $code === JSON_ERROR_DEPTH) {
                 throw new ParseException(sprintf('JSON parsing failed: %s', json_last_error_msg()), -1, null, $code);
             }
 
