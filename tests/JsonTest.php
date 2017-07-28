@@ -102,10 +102,10 @@ class JsonTest extends TestCase
     public function testParseErrorUtf8()
     {
         $json = "{\"message\": \"\xA4\xA6\xA8\xB4\xB8\xBC\xBD\xBE\"}";
-        $this->expectParseException($json, -1, 'Malformed UTF-8 characters, possibly incorrectly encoded');
+        $this->expectParseException($json, -1, 'Malformed UTF-8 characters, possibly incorrectly encoded', JSON_ERROR_UTF8);
     }
 
-    private function expectParseException($json, $line, $text = null)
+    private function expectParseException($json, $line, $text = null, $code = JSON_ERROR_SYNTAX)
     {
         try {
             $result = Json::parse($json);
@@ -117,6 +117,7 @@ class JsonTest extends TestCase
             ));
         } catch (ParseException $e) {
             $this->assertSame($line, $e->getParsedLine());
+            $this->assertSame($code, $e->getCode());
             $actualMsg = $e->getMessage();
             $this->assertStringStartsWith('JSON parsing failed: ', $actualMsg);
             $actualMsg = substr($actualMsg, 21);

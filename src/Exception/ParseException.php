@@ -19,9 +19,10 @@ class ParseException extends \RuntimeException
      * @param string      $message    The error message
      * @param int         $parsedLine The line where the error occurred
      * @param string|null $snippet    The snippet of code near the problem
+     * @param int         $code       The code
      * @param \Throwable  $previous   The previous exception
      */
-    public function __construct($message, $parsedLine = -1, $snippet = null, $previous = null)
+    public function __construct($message, $parsedLine = -1, $snippet = null, $code = 0, $previous = null)
     {
         $this->parsedLine = $parsedLine;
         $this->snippet = $snippet;
@@ -29,7 +30,7 @@ class ParseException extends \RuntimeException
 
         $this->updateRepr();
 
-        parent::__construct($this->message, 0, $previous);
+        parent::__construct($this->message, $code, $previous);
     }
 
     /**
@@ -65,7 +66,7 @@ class ParseException extends \RuntimeException
 
         $message = 'JSON parsing failed: ' . $message;
 
-        return new static($message, $line, $snippet, $exception);
+        return new static($message, $line, $snippet, JSON_ERROR_SYNTAX, $exception);
     }
 
     /**
