@@ -5,9 +5,9 @@ namespace Bolt\Common\Tests;
 use Bolt\Common\Exception\DumpException;
 use Bolt\Common\Exception\ParseException;
 use Bolt\Common\Json;
+use Bolt\Common\Tests\Fixtures\JsonMocker;
 use Bolt\Common\Tests\Fixtures\TestStringable;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Extension_FunctionMocker as FunctionMocker;
 
 class JsonTest extends TestCase
 {
@@ -226,33 +226,22 @@ class JsonTest extends TestCase
         }
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testDumpFail()
     {
-        $mock = FunctionMocker::start($this, 'Bolt\Common')
-            ->mockFunction('json_encode')
-            ->mockFunction('json_last_error_msg')
-            ->getMock()
-        ;
-        $mock
-            ->expects($this->once())
-            ->method('json_encode')
-            ->willReturn(false)
-        ;
-        $mock
-            ->expects($this->once())
-            ->method('json_last_error_msg')
-            ->willReturn('Unknown error')
-        ;
+        $mocker = JsonMocker::instance();
+        $mocker->setEncoder(function () {
+            return false;
+        });
+        $mocker->setLastMessageGetter(function () {
+            return 'Unknown error';
+        });
 
         $this->setExpectedException(DumpException::class, 'JSON dumping failed: Unknown error');
 
         try {
             Json::dump('');
         } finally {
-            FunctionMocker::tearDown();
+            $mocker->reset();
         }
     }
 
