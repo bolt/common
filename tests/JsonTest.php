@@ -129,12 +129,14 @@ class JsonTest extends TestCase
     public function testParseExceptionGettersSetters()
     {
         $ex = new ParseException('Uh oh.');
+        $ex->setRawMessage('Whoops.');
         $ex->setParsedLine(5);
         $ex->setSnippet('foo bar');
 
+        $this->assertEquals('Whoops.', $ex->getRawMessage());
         $this->assertEquals(5, $ex->getParsedLine());
         $this->assertEquals('foo bar', $ex->getSnippet());
-        $this->assertEquals('Uh oh at line 5 (near "foo bar").', $ex->getMessage());
+        $this->assertEquals('Whoops at line 5 (near "foo bar").', $ex->getMessage());
     }
 
     public function testDumpSimpleJsonString()

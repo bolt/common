@@ -69,6 +69,30 @@ class ParseException extends \RuntimeException
     }
 
     /**
+     * Gets the message without line number and snippet.
+     *
+     * @return string
+     */
+    public function getRawMessage()
+    {
+        return $this->rawMessage;
+    }
+
+    /**
+     * Sets the message.
+     *
+     * Don't include line number and snippet in this as they will be merged separately.
+     *
+     * @param string $rawMessage
+     */
+    public function setRawMessage($rawMessage)
+    {
+        $this->rawMessage = $rawMessage;
+
+        $this->updateRepr();
+    }
+
+    /**
      * Gets the line where the error occurred.
      *
      * @return int The file line
@@ -112,6 +136,9 @@ class ParseException extends \RuntimeException
         $this->updateRepr();
     }
 
+    /**
+     * Sets the exception message by joining the raw message, parsed line, and snippet.
+     */
     private function updateRepr()
     {
         $this->message = $this->rawMessage;
