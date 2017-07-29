@@ -1,0 +1,6 @@
+<?php
+
+return Bolt\CsFixer\Config::create()
+    ->addRules(Bolt\CsFixer\Rules::create()->risky())
+    ->in('.')
+;

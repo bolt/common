@@ -16,9 +16,19 @@
         "webmozart/assert": "^1.2"
     },
     "require-dev": {
+        "bolt/codingstyle": "^2.0@dev",
+        "escapestudios/symfony2-coding-standard": "^3.0@dev",
+        "friendsofphp/php-cs-fixer": "^2.4",
         "lstrojny/phpunit-function-mocker": "0.3.0",
         "phpunit/phpunit": "^4.8",
         "symfony/phpunit-bridge": "^3.3"
+    },
+    "scripts": {
+        "test": "phpunit",
+        "lint": [
+            "phpcbf",
+            "php-cs-fixer fix"
+        ]
     },
     "autoload": {
         "psr-4": {
