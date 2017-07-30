@@ -19,9 +19,10 @@ class ParseException extends \RuntimeException
      * @param string      $message    The error message
      * @param int         $parsedLine The line where the error occurred
      * @param string|null $snippet    The snippet of code near the problem
+     * @param int         $code       The code
      * @param \Throwable  $previous   The previous exception
      */
-    public function __construct($message, $parsedLine = -1, $snippet = null, $previous = null)
+    public function __construct($message, $parsedLine = -1, $snippet = null, $code = 0, $previous = null)
     {
         $this->parsedLine = $parsedLine;
         $this->snippet = $snippet;
@@ -29,7 +30,7 @@ class ParseException extends \RuntimeException
 
         $this->updateRepr();
 
-        parent::__construct($this->message, 0, $previous);
+        parent::__construct($this->message, $code, $previous);
     }
 
     /**
@@ -65,7 +66,31 @@ class ParseException extends \RuntimeException
 
         $message = 'JSON parsing failed: ' . $message;
 
-        return new static($message, $line, $snippet, $exception);
+        return new static($message, $line, $snippet, JSON_ERROR_SYNTAX, $exception);
+    }
+
+    /**
+     * Gets the message without line number and snippet.
+     *
+     * @return string
+     */
+    public function getRawMessage()
+    {
+        return $this->rawMessage;
+    }
+
+    /**
+     * Sets the message.
+     *
+     * Don't include line number and snippet in this as they will be merged separately.
+     *
+     * @param string $rawMessage
+     */
+    public function setRawMessage($rawMessage)
+    {
+        $this->rawMessage = $rawMessage;
+
+        $this->updateRepr();
     }
 
     /**
@@ -112,6 +137,9 @@ class ParseException extends \RuntimeException
         $this->updateRepr();
     }
 
+    /**
+     * Sets the exception message by joining the raw message, parsed line, and snippet.
+     */
     private function updateRepr()
     {
         $this->message = $this->rawMessage;

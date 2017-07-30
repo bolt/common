@@ -68,7 +68,7 @@ class Serialization
             ini_set('unserialize_callback_func', $unserializeHandler);
         }
 
-        throw new ParseException('Error parsing serialized value.', -1, null, $e);
+        throw new ParseException('Error parsing serialized value.', -1, null, 0, $e);
     }
 
     /**

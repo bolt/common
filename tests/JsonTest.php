@@ -5,9 +5,10 @@ namespace Bolt\Common\Tests;
 use Bolt\Common\Exception\DumpException;
 use Bolt\Common\Exception\ParseException;
 use Bolt\Common\Json;
+use Bolt\Common\Tests\Fixtures\JsonMocker;
+use Bolt\Common\Tests\Fixtures\TestJsonable;
 use Bolt\Common\Tests\Fixtures\TestStringable;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Extension_FunctionMocker as FunctionMocker;
 
 class JsonTest extends TestCase
 {
@@ -102,10 +103,10 @@ class JsonTest extends TestCase
     public function testParseErrorUtf8()
     {
         $json = "{\"message\": \"\xA4\xA6\xA8\xB4\xB8\xBC\xBD\xBE\"}";
-        $this->expectParseException($json, -1, 'Malformed UTF-8 characters, possibly incorrectly encoded');
+        $this->expectParseException($json, -1, 'Malformed UTF-8 characters, possibly incorrectly encoded', JSON_ERROR_UTF8);
     }
 
-    private function expectParseException($json, $line, $text = null)
+    private function expectParseException($json, $line, $text = null, $code = JSON_ERROR_SYNTAX)
     {
         try {
             $result = Json::parse($json);
@@ -117,6 +118,7 @@ class JsonTest extends TestCase
             ));
         } catch (ParseException $e) {
             $this->assertSame($line, $e->getParsedLine());
+            $this->assertSame($code, $e->getCode());
             $actualMsg = $e->getMessage();
             $this->assertStringStartsWith('JSON parsing failed: ', $actualMsg);
             $actualMsg = substr($actualMsg, 21);
@@ -126,15 +128,26 @@ class JsonTest extends TestCase
         }
     }
 
+    /**
+     * @expectedException \Bolt\Common\Exception\ParseException
+     * @expectedExceptionMessage JSON parsing failed: Maximum stack depth exceeded
+     */
+    public function testParseErrorDepth()
+    {
+        Json::parse('[[["hi"]]]', 0, 1);
+    }
+
     public function testParseExceptionGettersSetters()
     {
         $ex = new ParseException('Uh oh.');
+        $ex->setRawMessage('Whoops.');
         $ex->setParsedLine(5);
         $ex->setSnippet('foo bar');
 
+        $this->assertEquals('Whoops.', $ex->getRawMessage());
         $this->assertEquals(5, $ex->getParsedLine());
         $this->assertEquals('foo bar', $ex->getSnippet());
-        $this->assertEquals('Uh oh at line 5 (near "foo bar").', $ex->getMessage());
+        $this->assertEquals('Whoops at line 5 (near "foo bar").', $ex->getMessage());
     }
 
     public function testDumpSimpleJsonString()
@@ -205,6 +218,38 @@ class JsonTest extends TestCase
         $this->assertJsonFormat('"\\u018c"', $data, 0);
     }
 
+    public function testDumpConvertsInvalidEncodingAsLatin9()
+    {
+        $data = "\xA4\xA6\xA8\xB4\xB8\xBC\xBD\xBE";
+        $this->assertJsonFormat('"€ŠšŽžŒœŸ"', $data);
+
+        $data = [
+            'foo' => new TestJsonable([
+                new \ArrayObject(["\xA4"]),
+                new \ArrayIterator(["\xA6"]),
+                (object) ["\xA8"],
+            ]),
+            'bar' => 4,
+        ];
+        $this->assertJsonFormat('{"foo":[["€"],["Š"],["š"]],"bar":4}', $data, JSON_UNESCAPED_UNICODE);
+    }
+
+    public function testDumpThrowsCorrectErrorAfterFixingUtf8Error()
+    {
+        try {
+            Json::dump([["\xA4"]], 448, 1);
+        } catch (DumpException $e) {
+            if ($e->getCode() !== JSON_ERROR_DEPTH) {
+                $this->fail('Should have thrown exception with code for max depth');
+            }
+            $this->assertSame('JSON dumping failed: Maximum stack depth exceeded', $e->getMessage());
+
+            return;
+        }
+
+        $this->fail('Should have thrown ' . DumpException::class);
+    }
+
     private function assertJsonFormat($json, $data, $options = null)
     {
         if ($options === null) {
@@ -214,33 +259,22 @@ class JsonTest extends TestCase
         }
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testDumpFail()
     {
-        $mock = FunctionMocker::start($this, 'Bolt\Common')
-            ->mockFunction('json_encode')
-            ->mockFunction('json_last_error_msg')
-            ->getMock()
-        ;
-        $mock
-            ->expects($this->once())
-            ->method('json_encode')
-            ->willReturn(false)
-        ;
-        $mock
-            ->expects($this->once())
-            ->method('json_last_error_msg')
-            ->willReturn('Unknown error')
-        ;
+        $mocker = JsonMocker::instance();
+        $mocker->setEncoder(function () {
+            return false;
+        });
+        $mocker->setLastMessageGetter(function () {
+            return 'Unknown error';
+        });
 
         $this->setExpectedException(DumpException::class, 'JSON dumping failed: Unknown error');
 
         try {
             Json::dump('');
         } finally {
-            FunctionMocker::tearDown();
+            $mocker->reset();
         }
     }
 
