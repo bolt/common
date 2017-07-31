@@ -2,72 +2,104 @@
 
 This library provides utility functions to help simplify menial tasks.
 
-## `Assert` — Additional assertions built on `Webmozart\Assert`
+The Bolt team believes the PHP error reporting system is a mistake. Many
+built-in functions utilize it, leading to inconsistent results and head
+scratching.
 
-### `isArrayAccessible($value, $message = '')`
+This library provides some wrappers around some of these functions. Our code
+should always throw exceptions instead of triggering errors/warnings/notices
+(excluding deprecation warnings).
+
+Table of Contents:
+- [Assert](#assert)
+- [Deprecated](#deprecated)
+- [Json](#json)
+- [Str](#str)
+
+-----
+
+## `Assert`
+
+Additional assertions built on `Webmozart\Assert`
+
+
+### `isArrayAccessible`
+
+Throws `InvalidArgumentException` if `$value` is not an array or object
+implementing `ArrayAccess`.
 
 ```php
-// This will allow continued execution
-Assert::isArrayAccessible([1, 2, 3]);
-
-// This will allow continued execution
-Assert::isArrayAccessible(new \ArrayObject([1, 2, 3]));
-
-// This will throw an InvalidArgumentException
-Assert::isArrayAccessible(new \stdClass());
-
-// This will throw an InvalidArgumentException
-Assert::isArrayAccessible('foo bar');
+isArrayAccessible($value, string $message = ''): void
 ```
 
 
-### `isInstanceOfAny($value, array $classes, $message = '')`
+### `isInstanceOfAny`
+
+Throws `InvalidArgumentException` if `$value` is not an instance of one of the
+given classes/interfaces.
 
 ```php
-// This will allow continued execution
-Assert::isInstanceOfAny(new \ArrayIterator(), [\Iterator::class, \ArrayAccess::class]);
+isInstanceOfAny($value, string[] $classes, string $message = ''): void
+```
 
-// This will allow continued execution
-Assert::isInstanceOfAny(new \Exception(), [\Exception::class, \Countable::class]);
+### `isIterable`
 
-// This will throw an InvalidArgumentException
-Assert::isInstanceOfAny(new \Exception(), [\ArrayAccess::class, \Countable::class]);
+Throws `InvalidArgumentException` if `$value` is not an _iterable_. Same as
+`isTraversable()`, just a better name.
 
-// This will throw an InvalidArgumentException
-Assert::isInstanceOfAny([], [\stdClass::class]);
+```php
+isIterable($value, string $message = ''): void
 ```
 
 
-### `isIterable($value, $message = '')`
+## `Deprecated`
+
+Helper methods for triggering deprecation warnings.
+
+
+### `warn`
+
+Shortcut for triggering a deprecation warning for something.
 
 ```php
-// This will allow continued execution
-Assert::isIterable([1, 2, 3]);
+warn(string $subject, string|float $since = null, string $suggest = ''): void
+```
 
-// This will allow continued execution
-Assert::isIterable(new \ArrayObject([1, 2, 3]));
+Examples:
 
-// This will throw an InvalidArgumentException
-Assert::isIterable(123);
+```php
+// Triggers warning: "Doing foo is deprecated."
+Deprecated::warn('Doing foo');
 
-// This will throw an InvalidArgumentException
-Assert::isIterable(new \stdClass());
+// Triggers warning: "Doing foo is deprecated since 3.3 and will be removed in 4.0."
+Deprecated::warn('Doing foo', 3.3);
+
+// Triggers warning: "Doing foo is deprecated since 3.3 and will be removed in 4.0. Do bar instead."
+Deprecated::warn('Doing foo', 3.3, 'Do bar instead');
 ```
 
 
-## `Deprecated` — Deprecated code use notifications
-
-### `method($since = null, $suggest = '', $method = null)`
+### `method`
 
 Shortcut for triggering a deprecation warning for a method.
 
 ```php
-use Bolt\Common\Deprecated;
+method(string|float $since = null, string $suggest = '', string $method = null): void
+```
 
+`$suggest` can be a sentence describing what to use instead. Or it can be a
+method name or `class::method` which will be converted to a sentence.
+
+`$method` defaults to the method/function it was called from.
+  - If called from constructor, warning message says the class is deprecated.
+  - If called from magic method, warning message says the method/property
+    called with is deprecated.
+
+Example:
+
+```php
 class Foo
 {
-    public function hello() {}
-
     public function world()
     {
         // Triggers warning: "Foo::world() is deprecated since 3.3 and will be removed in 4.0. Use hello() instead."
@@ -77,13 +109,20 @@ class Foo
 ```
 
 
-### `cls($class, $since = null, $suggest = null)`
+### `cls`
 
 Shortcut for triggering a deprecation warning for a class.
 
 ```php
-use Bolt\Common\Deprecated;
+cls(string $class, string|float $since = null, string $suggest = null): void
+```
 
+`$suggest` can be a sentence describing what to use instead. Or it can be a
+class name which will be converted to a sentence.
+
+Examples:
+
+```php
 // Triggers warning: "Foo\Bar is deprecated."
 Deprecated::cls('Foo\Bar');
 
@@ -92,244 +131,143 @@ Deprecated::cls('Foo\Bar', null, 'Bar\Baz');
 ```
 
 
-### `warn($subject, $since = null, $suggest = '')`
+## `Json`
 
-Shortcut for triggering a deprecation warning for a subject.
+Handles JSON parsing/dumping with error handling.
+
+
+### `parse`
+
+Parses JSON _string_ to _array_ or _scalar_.
+Throws `ParseException` if anything goes wrong.
 
 ```php
-use Bolt\Common\Deprecated;
+parse(string $json, int $options = 0, int $depth = 512): string
+```
 
-// Triggers warning: "Doing foo is deprecated."
-Deprecated::warn('Doing foo');
-
-// Triggers warning: "Doing foo is deprecated since 3.3 and will be removed in 4.0."
-Deprecated::warn('Doing foo', 3.3);
+We use [`seld/jsonlint`](https://github.com/Seldaek/jsonlint) to determine why
+the parsing failed and include it in the exception message.
 
 
-// Triggers warning: "Doing foo is deprecated since 3.3 and will be removed in 4.0. Do bar instead."
-Deprecated::warn('Doing foo', 3.3, 'Do bar instead');
+### `dump`
+
+Dumps _mixed_ to JSON _string_. Throws `DumpException` if anything goes wrong.
+
+```php
+dump(mixed $data, int $options = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE, int $depth = 512): string
+```
+
+If input contains invalid UTF-8 characters we try to convert these for you
+before failing.
+
+
+### `test`
+
+Returns whether the string is valid JSON.
+
+```php
+test(string $json): bool
 ```
 
 
-### `raw($message)`
+## `Str`
 
-Trigger a generic deprecation warning.
-
-```php
-use Bolt\Common\Deprecated;
-
-```
+Common string methods.
 
 
-## `Json` — Class to parse and dump JSON with error handling
-
-### `parse($json, $options = 0, $depth = 512)`
-
-```php
-use Bolt\Common\Json;
-
-// $result will be a PHP array: ['foo' => 'bar']
-$result = Json::parse('{"foo": "bar"}';
-```
-
-
-### `dump($data, $options = 448, $depth = 512)`
-
-```php
-use Bolt\Common\Json;
-
-$data = ['name' => 'composer/composer'];
-
-// $result will be a JSON string equivalent to: '{"name": "composer/composer"}'
-$result = Json::dump($data);
-```
-
-
-## `Str` — Common string methods
-
-
-### `replaceFirst($subject, $search, $replace, $caseSensitive = true)`
+### `replaceFirst`
 
 Replaces the first occurrence of the $search text on the $subject.
 
 ```php
-use Bolt\Common\Str;
-
-// $result will be 'HelloFooHelloGoodbye'
-$result = Str::replaceFirst('HelloGoodbyeHelloGoodbye', 'Goodbye', 'Foo');
-
-// $result will be 'HelloFooHelloGoodbye'
-$result = Str::replaceFirst('HelloGOODBYEHelloGoodbye', 'Goodbye', 'Foo', false);
+replaceFirst(string $subject, string $search, string $replace, bool $caseSensitive = true): string
 ```
 
 
-### `replaceLast($subject, $search, $replace, $caseSensitive = true)`
+### `replaceLast`
 
 Replaces the last occurrence of the $search text on the $subject.
 
 ```php
-use Bolt\Common\Str;
-
-// $result will be 'HelloGoodbyeFooGoodbye'
-$result = Str::replaceLast('HelloGoodbyeHelloGoodbye', 'Hello', 'Foo');
-
-// $result will be 'HelloGoodbyeFooGoodbye'
-$result = Str::replaceLast('HelloGoodbyeHELLOGoodbye', 'Hello', 'Foo', false);
+replaceLast(string $subject, string $search, string $replace, bool $caseSensitive = true): string
 ```
 
 
-### `removeFirst($subject, $search, $caseSensitive = true)`
+### `removeFirst`
 
 Removes the first occurrence of the $search text on the $subject.
 
 ```php
-use Bolt\Common\Str;
-
-// $result will be 'HelloHelloGoodbye'
-$result = Str::removeFirst('HelloGoodbyeHelloGoodbye', 'Goodbye');
-
-// $result will be 'HelloHelloGoodbye'
-$result = Str::removeFirst('HelloGOODBYEHelloGoodbye', 'Goodbye', false);
-
+removeFirst(string $subject, string $search, bool $caseSensitive = true): string
 ```
 
-### `removeLast($subject, $search, $caseSensitive = true)`
+
+### `removeLast`
 
 Removes the last occurrence of the $search text on the $subject.
 
 ```php
-use Bolt\Common\Str;
-
-// $result will be 'HelloGoodbyeGoodbye'
-$result = Str::removeLast('HelloGoodbyeHelloGoodbye', 'Hello');
-
-// $result will be 'HelloGoodbyeGoodbye'
-$result = Str::removeLast('HelloGoodbyeHELLOGoodbye', 'Hello', false);
+removeLast(string $subject, string $search, bool $caseSensitive = true): string
 ```
 
 
-### `splitFirst($subject, $delimiter)`
+### `splitFirst`
 
 Splits a $subject on the $delimiter and returns the first part.
-  - If delimiter is empty an InvalidArgumentException is thrown
-  - If the delimiter is not found in the string the string is returned
 
 ```php
-use Bolt\Common\Str;
-
-// $result will be 'herp'
-$result = Str::splitFirst('herp derp terp lerp', ' ');
-
-// $result will be 'herp derp'
-$result = Str::splitFirst('herp derp', ',');
+splitFirst(string $subject, string $delimiter): string
 ```
 
 
-### `splitLast($subject, $delimiter)`
+### `splitLast`
 
 Splits a $subject on the $delimiter and returns the last part.
-  - If delimiter is empty an InvalidArgumentException is thrown
-  - If the delimiter is not found in the string the string is returned
 
 ```php
-use Bolt\Common\Str;
-
-// $result will be 'lerp'
-$result = Str::splitLast('herp derp terp lerp', ' ');
-
-// $result will be 'herp derp'
-$result = Str::splitLast('herp derp', ',');
+splitLast(string $subject, string $delimiter): string
 ```
 
-
-### `endsWith($subject, $search, $caseSensitive = true)`
+### `endsWith`
 
 Returns whether the subjects ends with the search string.
 
 ```php
-use Bolt\Common\Str;
-
-// $result will be true
-$result = Str::endsWith('FooBar', 'Bar');
-
-// $result will be true
-$result = Str::endsWith('FooBar', 'bar', false);
-
-// $result will be false
-$result = Str::endsWith('FooBar', 'Foo');
+endsWith(string $subject, string $search, bool $caseSensitive = true): bool
 ```
 
 
-### `className($class)`
+### `className`
 
 Returns the class name without the namespace, of a string FQCN, or object.
 
 ```php
-use Bolt\Common\Str;
-
-// $result will be 'JavaScript'
-$result = Str::className(new \Bolt\Asset\File\JavaScript());
-
-// $result will be 'Stylesheet'
-$result = Str::className('Bolt\Asset\File\Stylesheet');
+className(string|object $class): string
 ```
 
 
-### `humanize($text)`
+### `humanize`
 
-Makes a technical name human readable.
-  - Sequences of snake cased or camel cased are replaced by single spaces
-  - The first letter of the resulting string is capitalized, while all other
-    letters are turned to lowercase
+Converts a string from camel case and snake case to a human readable string.
 
 ```php
-use Bolt\Common\Str;
-
-// $result will be 'Foo bar'
-$result = Str::humanize('fooBar');
-
-// $result will be 'Foo bar'
-$result = Str::humanize('FooBar');
-
-// $result will be 'Foo bar'
-$result = Str::humanize('foo_bar');
+humanize(string $text): string
 ```
 
 
-### `camelCase($text, $lowercaseFirstChar = false)`
+### `camelCase`
 
 Converts a string from snake case to camel case.
 
 ```php
-use Bolt\Common\Str;
-
-// $result will be 'FooBar'
-$result = Str::camelCase('fooBar');
-
-// $result will be 'FooBar'
-$result = Str::camelCase('FooBar');
-
-// $result will be 'FooBar'
-$result = Str::camelCase('foo_bar');
-
-// $result will be 'fooBar'
-$result = Str::camelCase('foo_bar', true);
+camelCase(string $text, bool $lowercaseFirstChar = false): string
 ```
 
 
-### `snakeCase($text)`
+### `snakeCase`
 
 Converts a string from camel case to snake case.
 
 ```php
-use Bolt\Common\Str;
-
-// $result will be 'foo_bar'
-$result = Str::snakeCase('fooBar');
-
-// $result will be 'foo_bar'
-$result = Str::snakeCase('FooBar');
-
-// $result will be 'foo_bar'
-$result = Str::snakeCase('foo_bar');
+snakeCase(string $text): string
 ```

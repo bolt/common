@@ -3,7 +3,7 @@
 namespace Bolt\Common;
 
 /**
- * This class provides shortcuts for trigger deprecation warnings for various things.
+ * This class provides shortcuts for triggering deprecation warnings for various things.
  *
  * @author Carson Full <carsonfull@gmail.com>
  */
