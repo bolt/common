@@ -14,6 +14,7 @@ Table of Contents:
 - [Assert](#assert)
 - [Deprecated](#deprecated)
 - [Json](#json)
+- [Serialization](#serialization)
 - [Str](#str)
 
 -----
@@ -167,6 +168,40 @@ Returns whether the string is valid JSON.
 
 ```php
 test(string $json): bool
+```
+
+
+## `Serialization`
+
+Handles PHP serialization parsing/dumping with error handling.
+
+
+### `parse`
+
+Parses PHP serialized _string_.
+
+Throws `ParseException` if a serialized class cannot be found or anything else
+goes wrong.
+
+```php
+parse(string $value, array $options = []): mixed
+```
+
+Note: `$options` parameter is ignored on PHP 5.
+
+See [`unserialize()`](http://php.net/manual/en/function.unserialize.php) for
+details.
+
+
+### `dump`
+
+Dumps anything to a PHP serialized _string_.
+
+Throws `DumpException` if the input is not serializable or anything else goes
+wrong.
+
+```php
+dump(mixed $value): string
 ```
 
 
