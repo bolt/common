@@ -2,6 +2,7 @@
 
 namespace Bolt\Common\Tests;
 
+use Bolt\Common\Exception\DumpException;
 use Bolt\Common\Serialization;
 use PHPUnit\Framework\TestCase;
 
@@ -18,12 +19,15 @@ class SerializationTest extends TestCase
         $this->assertSame(serialize(new \stdClass()), $result);
     }
 
-    /**
-     * @expectedException \Bolt\Common\Exception\DumpException
-     * @expectedExceptionMessage Error serializing value. Serialization of 'Closure' is not allowed
-     */
     public function testDumpInvalid()
     {
+        if (!defined('HHVM_VERSION')) {
+            $message = "/Error serializing value\. Serialization of 'Closure' is not allowed/";
+        } else {
+            $message = '/Error serializing value\. Attempted to serialize unserializable builtin class Closure\$Bolt\\\\Common\\\\Tests\\\\SerializationTest::testDumpInvalid;\d+/';
+        }
+        $this->setExpectedExceptionRegExp(DumpException::class, $message);
+
         Serialization::dump(function () {});
     }
 
@@ -48,6 +52,13 @@ class SerializationTest extends TestCase
      */
     public function testParseClassNotFound()
     {
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped(
+                'HHVM has not implemented "unserialize_callback_func", meaning ' .
+                '__PHP_Incomplete_Class could be returned at any level and we are not going to look for them.'
+            );
+        }
+
         Serialization::parse('O:38:"ThisClassShouldNotExistsDueToDropBears":0:{}');
     }
 }
