@@ -13,6 +13,7 @@ should always throw exceptions instead of triggering errors/warnings/notices
 Table of Contents:
 - [Assert](#assert)
 - [Deprecated](#deprecated)
+- [Ini](#ini)
 - [Json](#json)
 - [Serialization](#serialization)
 - [Str](#str)
@@ -129,6 +130,71 @@ Deprecated::cls('Foo\Bar');
 
 // Triggers warning: "Foo\Bar is deprecated. Use Bar\Baz instead."
 Deprecated::cls('Foo\Bar', null, 'Bar\Baz');
+```
+
+
+## `Ini`
+
+Handles setting and retrieving values from PHP's configuration.
+
+
+### `has`
+
+Checks whether the key exists.
+
+```php
+has(string $key): bool
+```
+
+
+### `getStr`
+
+Get a string value. The default is returned if the key does not exist or the
+value is empty.
+
+```php
+getStr(string $key, string $default = null): ?string
+```
+
+
+### `getBool`
+
+Get a boolean value. False is returned if the key does not exist or the value
+is empty.
+
+```php
+getBool(string $key): bool
+```
+
+
+### `getNumeric`
+
+Get a numeric value. The default is returned if the key does not exist or the
+value is empty.
+
+```php
+getNumeric(string $key, int|float $default = null): int|float|null
+```
+
+
+### `getBytes`
+
+Get a memory size value, such as `memory_limit`, and convert it to an integer.
+The default is returned if the key does not exist or the value is empty.
+
+```php
+getBytes(string $key, int $default = null): ?int
+```
+
+
+### `set`
+
+Set a new value for the given key.
+Throws `RuntimeException` if the key does not exist, it is not editable, or
+something goes wrong.
+
+```php
+set(string $key, ?scalar $value): void
 ```
 
 
