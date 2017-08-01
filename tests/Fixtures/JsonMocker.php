@@ -2,6 +2,8 @@
 
 namespace Bolt\Common\Tests\Fixtures;
 
+use Bolt\Common\Json;
+
 // @codingStandardsIgnoreFile
 
 /**
@@ -46,6 +48,10 @@ class JsonMocker
      */
     private static function register()
     {
+        if (class_exists(Json::class, false)) {
+            throw new \LogicException(sprintf('%s() must be called before %s is loaded', __METHOD__, Json::class));
+        }
+
         $code = <<<'PHP'
 namespace Bolt\Common;
 
