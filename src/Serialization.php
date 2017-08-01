@@ -44,27 +44,18 @@ class Serialization
      */
     public static function parse($value, $options = [])
     {
-        static $handler;
-        if (!$handler) {
-            $handler = function ($severity, $message, $file, $line) {
-                throw new \ErrorException($message, 0, $severity, $file, $line);
-            };
-        }
-
-        set_error_handler($handler);
         $unserializeHandler = ini_set('unserialize_callback_func', __CLASS__ . '::handleUnserializeCallback');
         try {
             if (PHP_VERSION_ID < 70000) {
-                return unserialize($value);
+                return Thrower::call('unserialize', $value);
             }
 
-            return unserialize($value, $options);
+            return Thrower::call('unserialize', $value, $options);
         } catch (ParseException $e) {
             throw $e;
         } catch (\Error $e) {
         } catch (\Exception $e) {
         } finally {
-            restore_error_handler();
             ini_set('unserialize_callback_func', $unserializeHandler);
         }
 
