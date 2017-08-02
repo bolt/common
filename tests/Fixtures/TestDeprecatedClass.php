@@ -52,6 +52,16 @@ class TestDeprecatedClass
     {
         Deprecated::method(null, \ArrayObject::class);
     }
+
+    public static function someMethod()
+    {
+        static::deprecated();
+    }
+
+    private static function deprecated()
+    {
+        Deprecated::method(1.1, \ArrayObject::class, 1);
+    }
 }
 
 // @codingStandardsIgnoreLine

@@ -24,21 +24,31 @@ class Deprecated
      *     }
      * Will trigger: "Foo::world() is deprecated since 3.3 and will be removed in 4.0. Use hello() instead."
      *
-     * @param float|null  $since   The version it was deprecated in
-     * @param string      $suggest A method or class or suggestion of what to use instead.
-     *                             If it is a class and the class has a matching method name,
-     *                             that will be the suggestion.
-     * @param string|null $method  The method name. Defaults to method called from.
+     * @param float|null $since   The version it was deprecated in
+     * @param string     $suggest A method or class or suggestion of what to use instead.
+     *                            If it is a class and the class has a matching method name,
+     *                            that will be the suggestion.
+     * @param string|int $method  The method name or the index of the call stack to reference.
      */
-    public static function method($since = null, $suggest = '', $method = null)
+    public static function method($since = null, $suggest = '', $method = 0)
     {
         $function = $method;
         $constructor = false;
-        if ($method === null) {
-            $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
+        if ($method === null || is_int($method)) {
+            $frame = $method ?: 0;
+            Assert::greaterThanEq($frame, 0);
+
+            ++$frame; // account for this method
+
+            $stack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $frame + 1);
+            if (!isset($stack[$frame])) {
+                throw new \OutOfBoundsException(sprintf('%s is greater than the current call stack', $frame - 1));
+            }
+            $caller = $stack[$frame];
+
             $function = $caller['function'];
             if (in_array($function, ['__call', '__callStatic', '__set', '__get', '__isset', '__unset'], true)) {
-                $caller = debug_backtrace(false, 2)[1]; // with args
+                $caller = debug_backtrace(false, $frame + 1)[$frame]; // with args
                 $caller['function'] = $caller['args'][0];
             }
             if ($function === '__construct') {
@@ -47,6 +57,8 @@ class Deprecated
             } else {
                 $method = (isset($caller['class']) ? $caller['class'] . '::' : '') . $caller['function'];
             }
+        } else {
+            Assert::stringNotEmpty($method, 'Expected a non-empty string. Got: %s');
         }
 
         // Shortcut for suggested method

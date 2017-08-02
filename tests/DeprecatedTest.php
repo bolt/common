@@ -65,6 +65,45 @@ class DeprecatedTest extends TestCase
 
         TestDeprecatedClass::getArrayCopy();
         $this->assertDeprecation('Bolt\Common\Tests\Fixtures\TestDeprecatedClass::getArrayCopy() is deprecated. Use ArrayObject::getArrayCopy() instead.');
+
+        TestDeprecatedClass::someMethod();
+        $this->assertDeprecation('Bolt\Common\Tests\Fixtures\TestDeprecatedClass::someMethod() is deprecated since 1.1 and will be removed in 2.0. Use ArrayObject instead.');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Expected a value greater than or equal to 0. Got: -1
+     */
+    public function testMethodIndexNegative()
+    {
+        Deprecated::method(null, null, -1);
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     * @expectedExceptionMessage 9000 is greater than the current call stack
+     */
+    public function testMethodIndexOutOfBounds()
+    {
+        Deprecated::method(null, null, 9000);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Expected a non-empty string. Got: boolean
+     */
+    public function testMethodNotIntOrString()
+    {
+        Deprecated::method(null, null, false);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Expected a non-empty string. Got: ""
+     */
+    public function testMethodEmptyString()
+    {
+        Deprecated::method(null, null, '');
     }
 
     public function testClass()
