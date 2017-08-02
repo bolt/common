@@ -62,6 +62,9 @@ class DeprecatedTest extends TestCase
 
         new TestDeprecatedClass(true);
         $this->assertDeprecation('Bolt\Common\Tests\Fixtures\TestDeprecatedClass is deprecated.');
+
+        TestDeprecatedClass::getArrayCopy();
+        $this->assertDeprecation('Bolt\Common\Tests\Fixtures\TestDeprecatedClass::getArrayCopy() is deprecated. Use ArrayObject::getArrayCopy() instead.');
     }
 
     public function testClass()
