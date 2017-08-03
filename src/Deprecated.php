@@ -46,16 +46,20 @@ class Deprecated
             }
             $caller = $stack[$frame];
 
-            $function = $caller['function'];
-            if (in_array($function, ['__call', '__callStatic', '__set', '__get', '__isset', '__unset'], true)) {
-                $caller = debug_backtrace(false, $frame + 1)[$frame]; // with args
-                $caller['function'] = $caller['args'][0];
-            }
-            if ($function === '__construct') {
-                $method = $caller['class'];
-                $constructor = true;
+            if (isset($caller['class'])) {
+                $function = $caller['function'];
+                if ($function === '__construct') {
+                    $method = $caller['class'];
+                    $constructor = true;
+                } else {
+                    if ($function[0] === '_' && in_array($function, ['__call', '__callStatic', '__set', '__get', '__isset', '__unset'], true)) {
+                        $caller = debug_backtrace(false, $frame + 1)[$frame]; // with args
+                        $caller['function'] = $caller['args'][0];
+                    }
+                    $method = $caller['class'] . '::' . $caller['function'];
+                }
             } else {
-                $method = (isset($caller['class']) ? $caller['class'] . '::' : '') . $caller['function'];
+                $method = $caller['function'];
             }
         } else {
             Assert::stringNotEmpty($method, 'Expected a non-empty string. Got: %s');
@@ -78,15 +82,17 @@ class Deprecated
             return;
         }
 
-        if ($function === '__isset' || $function === '__unset') {
-            static::warn(substr($function, 2) . "($method)", $since, $suggest);
+        if ($function[0] === '_') {
+            if ($function === '__isset' || $function === '__unset') {
+                static::warn(substr($function, 2) . "($method)", $since, $suggest);
 
-            return;
-        }
-        if ($function === '__set' || $function === '__get') {
-            static::warn(strtoupper($function[2]) . "etting $method", $since, $suggest);
+                return;
+            }
+            if ($function === '__set' || $function === '__get') {
+                static::warn(strtoupper($function[2]) . "etting $method", $since, $suggest);
 
-            return;
+                return;
+            }
         }
 
         static::warn($method . '()', $since, $suggest);
