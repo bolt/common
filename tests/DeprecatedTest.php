@@ -61,7 +61,7 @@ class DeprecatedTest extends TestCase
         $this->assertDeprecation('unset(Bolt\Common\Tests\Fixtures\TestDeprecatedClass::magic) is deprecated.');
 
         new TestDeprecatedClass(true);
-        $this->assertDeprecation('Bolt\Common\Tests\Fixtures\TestDeprecatedClass is deprecated.');
+        $this->assertDeprecation('Bolt\Common\Tests\Fixtures\TestDeprecatedClass is deprecated. Use ArrayObject instead.');
 
         TestDeprecatedClass::getArrayCopy();
         $this->assertDeprecation('Bolt\Common\Tests\Fixtures\TestDeprecatedClass::getArrayCopy() is deprecated. Use ArrayObject::getArrayCopy() instead.');

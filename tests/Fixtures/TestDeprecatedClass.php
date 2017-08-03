@@ -9,7 +9,7 @@ class TestDeprecatedClass
     public function __construct($deprecatedClass = false)
     {
         if ($deprecatedClass) {
-            Deprecated::method();
+            Deprecated::method(null, \ArrayObject::class);
         }
     }
 

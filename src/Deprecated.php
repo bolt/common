@@ -33,6 +33,7 @@ class Deprecated
     public static function method($since = null, $suggest = '', $method = null)
     {
         $function = $method;
+        $constructor = false;
         if ($method === null) {
             $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
             $function = $caller['function'];
@@ -42,6 +43,7 @@ class Deprecated
             }
             if ($function === '__construct') {
                 $method = $caller['class'];
+                $constructor = true;
             } else {
                 $method = (isset($caller['class']) ? $caller['class'] . '::' : '') . $caller['function'];
             }
@@ -52,13 +54,13 @@ class Deprecated
             // Append () if it is a method/function (not a class)
             if (!class_exists($suggest)) {
                 $suggest .= '()';
-            } elseif (method_exists($suggest, $function)) {
+            } elseif (!$constructor && method_exists($suggest, $function)) {
                 $suggest = $suggest . '::' . $function . '()';
             }
             $suggest = "Use $suggest instead.";
         }
 
-        if ($function === '__construct') {
+        if ($constructor) {
             static::cls($method, $since, $suggest);
 
             return;
