@@ -63,9 +63,3 @@ class TestDeprecatedClass
         Deprecated::method(1.1, \ArrayObject::class, 1);
     }
 }
-
-// @codingStandardsIgnoreLine
-function deprecatedFunction()
-{
-    Deprecated::method();
-}

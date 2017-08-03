@@ -35,9 +35,6 @@ class DeprecatedTest extends TestCase
         TestDeprecatedClass::foo();
         $this->assertDeprecation('Bolt\Common\Tests\Fixtures\TestDeprecatedClass::foo() is deprecated.');
 
-        Fixtures\deprecatedFunction();
-        $this->assertDeprecation('Bolt\Common\Tests\Fixtures\deprecatedFunction() is deprecated.');
-
         /* @noinspection PhpUndefinedMethodInspection */
         TestDeprecatedClass::magicStatic();
         $this->assertDeprecation('Bolt\Common\Tests\Fixtures\TestDeprecatedClass::magicStatic() is deprecated.');
@@ -68,6 +65,12 @@ class DeprecatedTest extends TestCase
 
         TestDeprecatedClass::someMethod();
         $this->assertDeprecation('Bolt\Common\Tests\Fixtures\TestDeprecatedClass::someMethod() is deprecated since 1.1 and will be removed in 2.0. Use ArrayObject instead.');
+    }
+
+    public function testMethodFunction()
+    {
+        eval('namespace Bolt\Common { function deprecatedFunction() { Deprecated::method(); }; deprecatedFunction(); }');
+        $this->assertDeprecation('Bolt\Common\deprecatedFunction() is deprecated.');
     }
 
     /**
