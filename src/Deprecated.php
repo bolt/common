@@ -25,43 +25,54 @@ class Deprecated
      * Will trigger: "Foo::world() is deprecated since 3.3 and will be removed in 4.0. Use hello() instead."
      *
      * @param float|null  $since   The version it was deprecated in
-     * @param string      $suggest A method or class or suggestion of what to use instead
+     * @param string      $suggest A method or class or suggestion of what to use instead.
+     *                             If it is a class and the class has a matching method name,
+     *                             that will be the suggestion.
      * @param string|null $method  The method name. Defaults to method called from.
      */
     public static function method($since = null, $suggest = '', $method = null)
     {
+        $function = $method;
+        if ($method === null) {
+            $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
+            $function = $caller['function'];
+            if (in_array($function, ['__call', '__callStatic', '__set', '__get', '__isset', '__unset'], true)) {
+                $caller = debug_backtrace(false, 2)[1]; // with args
+                $caller['function'] = $caller['args'][0];
+            }
+            if ($function === '__construct') {
+                $method = $caller['class'];
+            } else {
+                $method = (isset($caller['class']) ? $caller['class'] . '::' : '') . $caller['function'];
+            }
+        }
+
         // Shortcut for suggested method
         if ($suggest && preg_match('/\s/', $suggest) === 0) {
             // Append () if it is a method/function (not a class)
             if (!class_exists($suggest)) {
                 $suggest .= '()';
+            } elseif (method_exists($suggest, $function)) {
+                $suggest = $suggest . '::' . $function . '()';
             }
             $suggest = "Use $suggest instead.";
         }
 
-        if ($method === null) {
-            $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
-            $function = $caller['function'];
-            if ($function === '__construct') {
-                static::cls($caller['class'], $since, $suggest);
+        if ($function === '__construct') {
+            static::cls($method, $since, $suggest);
 
-                return;
-            }
-            if (in_array($function, ['__call', '__callStatic', '__set', '__get', '__isset', '__unset'], true)) {
-                $caller = debug_backtrace(false, 2)[1]; // with args
-                $caller['function'] = $caller['args'][0];
-            }
-            $method = (isset($caller['class']) ? $caller['class'] . '::' : '') . $caller['function'];
-            if ($function === '__isset' || $function === '__unset') {
-                static::warn(substr($function, 2) . "($method)", $since, $suggest);
+            return;
+        }
 
-                return;
-            }
-            if ($function === '__set' || $function === '__get') {
-                static::warn(strtoupper($function[2]) . "etting $method", $since, $suggest);
+        if ($function === '__isset' || $function === '__unset') {
+            static::warn(substr($function, 2) . "($method)", $since, $suggest);
 
-                return;
-            }
+            return;
+        }
+        if ($function === '__set' || $function === '__get') {
+            static::warn(strtoupper($function[2]) . "etting $method", $since, $suggest);
+
+            return;
         }
 
         static::warn($method . '()', $since, $suggest);

@@ -47,6 +47,11 @@ class TestDeprecatedClass
     {
         Deprecated::method();
     }
+
+    public static function getArrayCopy()
+    {
+        Deprecated::method(null, \ArrayObject::class);
+    }
 }
 
 // @codingStandardsIgnoreLine
