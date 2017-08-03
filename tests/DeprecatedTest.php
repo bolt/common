@@ -106,6 +106,16 @@ class DeprecatedTest extends TestCase
         Deprecated::method(null, null, '');
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Bolt\Common\Deprecated::method() must be called from within a function/method.
+     */
+    public function testMethodNotFunction()
+    {
+        // Using eval here because it is the easiest, but this also applies to require(_once)/include(_once)
+        eval('\Bolt\Common\Deprecated::method();');
+    }
+
     public function testClass()
     {
         Deprecated::cls('Foo\Bar');

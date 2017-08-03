@@ -60,6 +60,12 @@ class Deprecated
                 }
             } else {
                 $method = $caller['function'];
+
+                // Assert the method isn't called directly from a script,
+                // else we would be saying "require() is deprecated" lol.
+                if (!function_exists($method)) {
+                    throw new \InvalidArgumentException(sprintf('%s() must be called from within a function/method.', __METHOD__));
+                }
             }
         } else {
             Assert::stringNotEmpty($method, 'Expected a non-empty string. Got: %s');
