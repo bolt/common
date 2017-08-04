@@ -20,12 +20,12 @@ class TestDeprecatedClass
 
     public function __call($name, $arguments)
     {
-        Deprecated::method();
+        Deprecated::method(null, \ArrayObject::class);
     }
 
     public static function __callStatic($name, $arguments)
     {
-        Deprecated::method();
+        Deprecated::method(null, \ArrayObject::class);
     }
 
     public static function getArrayCopy()

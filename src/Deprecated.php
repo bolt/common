@@ -54,9 +54,9 @@ class Deprecated
                 } else {
                     if ($function === '__call' || $function === '__callStatic') {
                         $caller = debug_backtrace(false, $frame + 1)[$frame]; // with args
-                        $caller['function'] = $caller['args'][0];
+                        $function = $caller['args'][0];
                     }
-                    $method = $caller['class'] . '::' . $caller['function'];
+                    $method = $caller['class'] . '::' . $function;
                 }
             } else {
                 $method = $caller['function'];

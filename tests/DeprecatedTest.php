@@ -47,12 +47,19 @@ class DeprecatedTest extends TestCase
     {
         /* @noinspection PhpUndefinedMethodInspection */
         TestDeprecatedClass::magicStatic();
-        $this->assertDeprecation(TestDeprecatedClass::class . '::magicStatic() is deprecated.');
+        $this->assertDeprecation(TestDeprecatedClass::class . '::magicStatic() is deprecated. Use ArrayObject instead.');
+
+        /* @noinspection PhpUndefinedMethodInspection */
+        TestDeprecatedClass::append();
+        $this->assertDeprecation(TestDeprecatedClass::class . '::append() is deprecated. Use ArrayObject::append() instead.');
 
         $cls = new TestDeprecatedClass();
         /* @noinspection PhpUndefinedMethodInspection */
         $cls->magic();
-        $this->assertDeprecation(TestDeprecatedClass::class . '::magic() is deprecated.');
+        $this->assertDeprecation(TestDeprecatedClass::class . '::magic() is deprecated. Use ArrayObject instead.');
+        /* @noinspection PhpUndefinedMethodInspection */
+        $cls->append();
+        $this->assertDeprecation(TestDeprecatedClass::class . '::append() is deprecated. Use ArrayObject::append() instead.');
     }
 
     public function testMethodFunction()
