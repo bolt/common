@@ -55,23 +55,6 @@ class DeprecatedTest extends TestCase
         $this->assertDeprecation(TestDeprecatedClass::class . '::magic() is deprecated.');
     }
 
-    public function testMethodMagicProperty()
-    {
-        $cls = new TestDeprecatedClass();
-        /* @noinspection PhpUndefinedFieldInspection */
-        $cls->magic;
-        $this->assertDeprecation('Getting ' . TestDeprecatedClass::class . '::magic is deprecated.');
-
-        /* @noinspection PhpUndefinedFieldInspection */
-        $cls->magic = 'derp';
-        $this->assertDeprecation('Setting ' . TestDeprecatedClass::class . '::magic is deprecated.');
-
-        isset($cls->magic);
-        $this->assertDeprecation('isset(' . TestDeprecatedClass::class . '::magic) is deprecated.');
-        unset($cls->magic);
-        $this->assertDeprecation('unset(' . TestDeprecatedClass::class . '::magic) is deprecated.');
-    }
-
     public function testMethodFunction()
     {
         eval('namespace Bolt\Common { function deprecatedFunction() { Deprecated::method(); }; deprecatedFunction(); }');

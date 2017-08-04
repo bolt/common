@@ -28,26 +28,6 @@ class TestDeprecatedClass
         Deprecated::method();
     }
 
-    public function __get($name)
-    {
-        Deprecated::method();
-    }
-
-    public function __set($name, $value)
-    {
-        Deprecated::method();
-    }
-
-    public function __isset($name)
-    {
-        Deprecated::method();
-    }
-
-    public function __unset($name)
-    {
-        Deprecated::method();
-    }
-
     public static function getArrayCopy()
     {
         Deprecated::method(null, \ArrayObject::class);

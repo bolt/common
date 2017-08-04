@@ -52,7 +52,7 @@ class Deprecated
                     $method = $caller['class'];
                     $constructor = true;
                 } else {
-                    if ($function[0] === '_' && in_array($function, ['__call', '__callStatic', '__set', '__get', '__isset', '__unset'], true)) {
+                    if ($function === '__call' || $function === '__callStatic') {
                         $caller = debug_backtrace(false, $frame + 1)[$frame]; // with args
                         $caller['function'] = $caller['args'][0];
                     }
@@ -86,19 +86,6 @@ class Deprecated
             static::cls($method, $since, $suggest);
 
             return;
-        }
-
-        if ($function[0] === '_') {
-            if ($function === '__isset' || $function === '__unset') {
-                static::warn(substr($function, 2) . "($method)", $since, $suggest);
-
-                return;
-            }
-            if ($function === '__set' || $function === '__get') {
-                static::warn(strtoupper($function[2]) . "etting $method", $since, $suggest);
-
-                return;
-            }
         }
 
         static::warn($method . '()', $since, $suggest);
