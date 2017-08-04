@@ -15,7 +15,7 @@ class TestDeprecatedClass
 
     public static function foo()
     {
-        Deprecated::method();
+        Deprecated::method(null, \ArrayObject::class);
     }
 
     public function __call($name, $arguments)
@@ -60,6 +60,6 @@ class TestDeprecatedClass
 
     private static function deprecated()
     {
-        Deprecated::method(1.1, \ArrayObject::class, 1);
+        Deprecated::method(null, \ArrayObject::class, 1);
     }
 }

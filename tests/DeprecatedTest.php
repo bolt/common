@@ -17,60 +17,71 @@ class DeprecatedTest extends TestCase
     {
         Deprecated::method(3.0, 'baz', 'Foo::bar');
         $this->assertDeprecation('Foo::bar() is deprecated since 3.0 and will be removed in 4.0. Use baz() instead.');
-
-        $realClass = static::class;
-        Deprecated::method(3.0, $realClass, 'Foo::bar');
-        $this->assertDeprecation(
-            "Foo::bar() is deprecated since 3.0 and will be removed in 4.0. Use $realClass instead."
-        );
-
-        Deprecated::method(3.0, 'Do it this way instead.', 'Foo::bar');
-        $this->assertDeprecation(
-            'Foo::bar() is deprecated since 3.0 and will be removed in 4.0. Do it this way instead.'
-        );
     }
 
-    public function testMethodUsingBacktrace()
+    public function testMethodSentenceSuggestion()
+    {
+        Deprecated::method(null, 'Do it this way instead.', 'Foo::bar');
+        $this->assertDeprecation('Foo::bar() is deprecated. Do it this way instead.');
+    }
+
+    public function testMethodSuggestClass()
     {
         TestDeprecatedClass::foo();
-        $this->assertDeprecation('Bolt\Common\Tests\Fixtures\TestDeprecatedClass::foo() is deprecated.');
+        $this->assertDeprecation(TestDeprecatedClass::class . '::foo() is deprecated. Use ArrayObject instead.');
+    }
 
+    public function testMethodSuggestClassWithMatchingMethod()
+    {
+        TestDeprecatedClass::getArrayCopy();
+        $this->assertDeprecation(TestDeprecatedClass::class . '::getArrayCopy() is deprecated. Use ArrayObject::getArrayCopy() instead.');
+    }
+
+    public function testMethodConstructor()
+    {
+        new TestDeprecatedClass(true);
+        $this->assertDeprecation(TestDeprecatedClass::class . ' is deprecated. Use ArrayObject instead.');
+    }
+
+    public function testMethodMagicCall()
+    {
         /* @noinspection PhpUndefinedMethodInspection */
         TestDeprecatedClass::magicStatic();
-        $this->assertDeprecation('Bolt\Common\Tests\Fixtures\TestDeprecatedClass::magicStatic() is deprecated.');
+        $this->assertDeprecation(TestDeprecatedClass::class . '::magicStatic() is deprecated.');
 
         $cls = new TestDeprecatedClass();
         /* @noinspection PhpUndefinedMethodInspection */
         $cls->magic();
-        $this->assertDeprecation('Bolt\Common\Tests\Fixtures\TestDeprecatedClass::magic() is deprecated.');
+        $this->assertDeprecation(TestDeprecatedClass::class . '::magic() is deprecated.');
+    }
 
+    public function testMethodMagicProperty()
+    {
+        $cls = new TestDeprecatedClass();
         /* @noinspection PhpUndefinedFieldInspection */
         $cls->magic;
-        $this->assertDeprecation('Getting Bolt\Common\Tests\Fixtures\TestDeprecatedClass::magic is deprecated.');
+        $this->assertDeprecation('Getting ' . TestDeprecatedClass::class . '::magic is deprecated.');
 
         /* @noinspection PhpUndefinedFieldInspection */
         $cls->magic = 'derp';
-        $this->assertDeprecation('Setting Bolt\Common\Tests\Fixtures\TestDeprecatedClass::magic is deprecated.');
+        $this->assertDeprecation('Setting ' . TestDeprecatedClass::class . '::magic is deprecated.');
 
         isset($cls->magic);
-        $this->assertDeprecation('isset(Bolt\Common\Tests\Fixtures\TestDeprecatedClass::magic) is deprecated.');
+        $this->assertDeprecation('isset(' . TestDeprecatedClass::class . '::magic) is deprecated.');
         unset($cls->magic);
-        $this->assertDeprecation('unset(Bolt\Common\Tests\Fixtures\TestDeprecatedClass::magic) is deprecated.');
-
-        new TestDeprecatedClass(true);
-        $this->assertDeprecation('Bolt\Common\Tests\Fixtures\TestDeprecatedClass is deprecated. Use ArrayObject instead.');
-
-        TestDeprecatedClass::getArrayCopy();
-        $this->assertDeprecation('Bolt\Common\Tests\Fixtures\TestDeprecatedClass::getArrayCopy() is deprecated. Use ArrayObject::getArrayCopy() instead.');
-
-        TestDeprecatedClass::someMethod();
-        $this->assertDeprecation('Bolt\Common\Tests\Fixtures\TestDeprecatedClass::someMethod() is deprecated since 1.1 and will be removed in 2.0. Use ArrayObject instead.');
+        $this->assertDeprecation('unset(' . TestDeprecatedClass::class . '::magic) is deprecated.');
     }
 
     public function testMethodFunction()
     {
         eval('namespace Bolt\Common { function deprecatedFunction() { Deprecated::method(); }; deprecatedFunction(); }');
         $this->assertDeprecation('Bolt\Common\deprecatedFunction() is deprecated.');
+    }
+
+    public function testMethodIndex()
+    {
+        TestDeprecatedClass::someMethod();
+        $this->assertDeprecation(TestDeprecatedClass::class . '::someMethod() is deprecated. Use ArrayObject instead.');
     }
 
     /**
