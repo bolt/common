@@ -28,47 +28,16 @@ class Deprecated
      * @param string     $suggest A method or class or suggestion of what to use instead.
      *                            If it is a class and the class has a matching method name,
      *                            that will be the suggestion.
-     * @param string|int $method  The method name or the index of the call stack to reference.
+     * @param string|int $subject The method or class name or the index of the call stack to reference
      */
-    public static function method($since = null, $suggest = '', $method = 0)
+    public static function method($since = null, $suggest = '', $subject = 0)
     {
-        $function = $method;
-        $constructor = false;
-        if ($method === null || is_int($method)) {
-            $frame = $method ?: 0;
-            Assert::greaterThanEq($frame, 0);
-
-            ++$frame; // account for this method
-
-            $stack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $frame + 1);
-            if (!isset($stack[$frame])) {
-                throw new \OutOfBoundsException(sprintf('%s is greater than the current call stack', $frame - 1));
-            }
-            $caller = $stack[$frame];
-
-            if (isset($caller['class'])) {
-                $function = $caller['function'];
-                if ($function === '__construct') {
-                    $method = $caller['class'];
-                    $constructor = true;
-                } else {
-                    if ($function === '__call' || $function === '__callStatic') {
-                        $caller = debug_backtrace(false, $frame + 1)[$frame]; // with args
-                        $function = $caller['args'][0];
-                    }
-                    $method = $caller['class'] . '::' . $function;
-                }
-            } else {
-                $method = $caller['function'];
-
-                // Assert the method isn't called directly from a script,
-                // else we would be saying "require() is deprecated" lol.
-                if (!function_exists($method)) {
-                    throw new \InvalidArgumentException(sprintf('%s() must be called from within a function/method.', __METHOD__));
-                }
-            }
+        if ($subject === null || is_int($subject)) {
+            list($subject, $function, $class, $constructor) = static::getCaller($subject ?: 0);
         } else {
-            Assert::stringNotEmpty($method, 'Expected a non-empty string. Got: %s');
+            Assert::stringNotEmpty($subject, 'Expected a non-empty string. Got: %s');
+            $function = $subject;
+            $constructor = false;
         }
 
         // Shortcut for suggested method
@@ -77,18 +46,72 @@ class Deprecated
             if (!class_exists($suggest)) {
                 $suggest .= '()';
             } elseif (!$constructor && method_exists($suggest, $function)) {
+                // $suggest is class that has matching method name and is not the constructor
                 $suggest = $suggest . '::' . $function . '()';
             }
             $suggest = "Use $suggest instead.";
         }
 
-        if ($constructor) {
-            static::cls($method, $since, $suggest);
-
-            return;
+        if (!$constructor) {
+            $subject .= '()';
         }
 
-        static::warn($method . '()', $since, $suggest);
+        static::warn($subject, $since, $suggest);
+    }
+
+    /**
+     * Get info about caller at index.
+     *
+     * @param int $index
+     * @param int $offset
+     *
+     * @return array [string repr, function name, class name or false, isConstructor]
+     */
+    protected static function getCaller($index, $offset = 1)
+    {
+        Assert::greaterThanEq($index, 0);
+
+        $index += $offset + 1;
+
+        $stack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $index + 1);
+        if (!isset($stack[$index])) {
+            throw new \OutOfBoundsException(sprintf('%s is greater than the current call stack', $index - $offset - 1));
+        }
+        $frame = $stack[$index];
+
+        if (!isset($frame['class'])) {
+            // Assert the function isn't called directly from a script,
+            // else we would be saying "require() is deprecated" lol.
+            if (!function_exists($frame['function'])) {
+                $frame = $stack[$index - $offset];
+                throw new \InvalidArgumentException(
+                    sprintf('%s::%s() must be called from within a function/method.', $frame['class'], $frame['function'])
+                );
+            }
+
+            return [
+                $frame['function'],
+                $frame['function'],
+                false,
+                false,
+            ];
+        }
+
+        $class = $frame['class'];
+        $function = $frame['function'];
+        $constructor = $function === '__construct';
+
+        if ($function === '__call' || $function === '__callStatic') {
+            $frame = debug_backtrace(false, $index + 1)[$index]; // with args
+            $function = $frame['args'][0];
+        }
+
+        return [
+            $class . (!$constructor ? '::' . $function : ''),
+            $function,
+            $class,
+            $constructor,
+        ];
     }
 
     /**
