@@ -62,10 +62,12 @@ final class Json
             return null;
         }
 
+        $json = (string) $json;
+
         $data = @json_decode($json, true, $depth, $options);
 
-        if ($data === null && ($code = json_last_error()) !== JSON_ERROR_NONE) {
-            if ($code === JSON_ERROR_UTF8 || $code === JSON_ERROR_DEPTH) {
+        if ($data === null && ($json === '' || ($code = json_last_error()) !== JSON_ERROR_NONE)) {
+            if (isset($code) && ($code === JSON_ERROR_UTF8 || $code === JSON_ERROR_DEPTH)) {
                 throw new ParseException(sprintf('JSON parsing failed: %s', json_last_error_msg()), -1, null, $code);
             }
 
@@ -92,8 +94,15 @@ final class Json
             return false;
         }
 
+        $json = (string) $json;
+
+        // valid for PHP 5.x, invalid for PHP 7.x
+        if ($json === '') {
+            return false;
+        }
+
         // Don't call our parse(), because we don't need the extra syntax checking.
-        @json_decode((string) $json);
+        @json_decode($json);
 
         return json_last_error() === JSON_ERROR_NONE;
     }

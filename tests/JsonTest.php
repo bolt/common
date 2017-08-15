@@ -22,6 +22,16 @@ class JsonTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], Json::parse('{"foo": "bar"}'));
     }
 
+    public function testParseErrorEmptyString()
+    {
+        $this->expectParseException('', 0);
+    }
+
+    public function testParseErrorObjectEmptyString()
+    {
+        $this->expectParseException(new TestStringable(''), 0);
+    }
+
     public function testParseErrorDetectExtraComma()
     {
         $json = '{
@@ -282,6 +292,8 @@ class JsonTest extends TestCase
     {
         $this->assertFalse(Json::test(null));
         $this->assertFalse(Json::test(123));
+        $this->assertFalse(Json::test(''));
+        $this->assertFalse(Json::test(new TestStringable('')));
         $this->assertTrue(Json::test('{}'));
         $this->assertTrue(Json::test(new TestStringable('{}')));
 
