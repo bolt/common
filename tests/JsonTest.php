@@ -270,13 +270,9 @@ class JsonTest extends TestCase
         $this->fail('Should have thrown ' . DumpException::class);
     }
 
-    private function assertJsonFormat($json, $data, $options = null)
+    private function assertJsonFormat($json, $data, $options = Json::HUMAN)
     {
-        if ($options === null) {
-            $this->assertEquals($json, Json::dump($data));
-        } else {
-            $this->assertEquals($json, Json::dump($data, $options));
-        }
+        $this->assertEquals($json, Json::dump($data, $options));
     }
 
     public function testDumpFail()

@@ -13,6 +13,24 @@ use Seld\JsonLint\ParsingException;
 final class Json
 {
     /**
+     * Dump JSON easy to read for humans.
+     * Shortcut for JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE.
+     */
+    const HUMAN = 448;
+
+    /**
+     * Dump JSON without escaping slashes or unicode.
+     * Shortcut for JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE.
+     */
+    const UNESCAPED = 320;
+
+    /**
+     * Dump JSON safe for HTML.
+     * Shortcut for JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT.
+     */
+    const HTML = 15;
+
+    /**
      * Dumps a array/object into a JSON string.
      *
      * @param mixed $data    Data to encode into a formatted JSON string
@@ -24,7 +42,7 @@ final class Json
      *
      * @return string
      */
-    public static function dump($data, $options = 448, $depth = 512)
+    public static function dump($data, $options = self::HUMAN, $depth = 512)
     {
         $json = @json_encode($data, $options, $depth);
 
