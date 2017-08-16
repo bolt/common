@@ -228,6 +228,16 @@ class JsonTest extends TestCase
         $this->assertJsonFormat('"\\u018c"', $data, 0);
     }
 
+    public function testDumpEscapesLineTerminators()
+    {
+        $this->assertJsonFormat('"JS\\u2029ON ro\\u2028cks"', 'JS ON ro cks', JSON_UNESCAPED_UNICODE);
+        $this->assertJsonFormat('"JS\\u2029ON ro\\u2028cks"', 'JS ON ro cks', JSON_UNESCAPED_UNICODE);
+
+        if (PHP_VERSION_ID >= 70100) {
+            $this->assertJsonFormat('"JS ON ro cks"', 'JS ON ro cks', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS);
+        }
+    }
+
     public function testDumpConvertsInvalidEncodingAsLatin9()
     {
         $data = "\xA4\xA6\xA8\xB4\xB8\xBC\xBD\xBE";

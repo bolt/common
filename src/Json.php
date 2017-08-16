@@ -28,18 +28,22 @@ final class Json
     {
         $json = @json_encode($data, $options, $depth);
 
-        if ($json !== false) {
-            return $json;
-        }
-
         // If UTF-8 error, try to convert and try again before failing.
-        if (json_last_error() === JSON_ERROR_UTF8) {
+        if ($json === false && json_last_error() === JSON_ERROR_UTF8) {
             static::detectAndCleanUtf8($data);
 
             $json = @json_encode($data, $options, $depth);
-            if ($json !== false) {
-                return $json;
+        }
+
+        if ($json !== false) {
+            // Match PHP 7.1 functionality
+            // Escape line terminators with JSON_UNESCAPED_UNICODE unless JSON_UNESCAPED_LINE_TERMINATORS is given
+            if (PHP_VERSION_ID < 70100 && $options & JSON_UNESCAPED_UNICODE && ($options & 2048) === 0) {
+                $json = str_replace("\xe2\x80\xa8", '\\u2028', $json);
+                $json = str_replace("\xe2\x80\xa9", '\\u2029', $json);
             }
+
+            return $json;
         }
 
         throw new DumpException(sprintf('JSON dumping failed: %s', json_last_error_msg()), json_last_error());
