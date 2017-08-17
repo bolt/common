@@ -24,29 +24,20 @@ class Deprecated
      *     }
      * Will trigger: "Foo::world() is deprecated since 3.3 and will be removed in 4.0. Use hello() instead."
      *
-     * @param float|null  $since   The version it was deprecated in
-     * @param string      $suggest A method or class or suggestion of what to use instead.
-     *                             If it is a class and the class has a matching method name,
-     *                             that will be the suggestion.
-     * @param string|null $method  The method name. Defaults to method called from.
+     * @param float|null $since   The version it was deprecated in
+     * @param string     $suggest A method or class or suggestion of what to use instead.
+     *                            If it is a class and the class has a matching method name,
+     *                            that will be the suggestion.
+     * @param string|int $subject The method or class name or the index of the call stack to reference
      */
-    public static function method($since = null, $suggest = '', $method = null)
+    public static function method($since = null, $suggest = '', $subject = 0)
     {
-        $function = $method;
-        $constructor = false;
-        if ($method === null) {
-            $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
-            $function = $caller['function'];
-            if (in_array($function, ['__call', '__callStatic', '__set', '__get', '__isset', '__unset'], true)) {
-                $caller = debug_backtrace(false, 2)[1]; // with args
-                $caller['function'] = $caller['args'][0];
-            }
-            if ($function === '__construct') {
-                $method = $caller['class'];
-                $constructor = true;
-            } else {
-                $method = (isset($caller['class']) ? $caller['class'] . '::' : '') . $caller['function'];
-            }
+        if ($subject === null || is_int($subject)) {
+            list($subject, $function, $class, $constructor) = static::getCaller($subject ?: 0);
+        } else {
+            Assert::stringNotEmpty($subject, 'Expected a non-empty string. Got: %s');
+            $function = $subject;
+            $constructor = false;
         }
 
         // Shortcut for suggested method
@@ -55,29 +46,72 @@ class Deprecated
             if (!class_exists($suggest)) {
                 $suggest .= '()';
             } elseif (!$constructor && method_exists($suggest, $function)) {
+                // $suggest is class that has matching method name and is not the constructor
                 $suggest = $suggest . '::' . $function . '()';
             }
             $suggest = "Use $suggest instead.";
         }
 
-        if ($constructor) {
-            static::cls($method, $since, $suggest);
-
-            return;
+        if (!$constructor) {
+            $subject .= '()';
         }
 
-        if ($function === '__isset' || $function === '__unset') {
-            static::warn(substr($function, 2) . "($method)", $since, $suggest);
+        static::warn($subject, $since, $suggest);
+    }
 
-            return;
+    /**
+     * Get info about caller at index.
+     *
+     * @param int $index
+     * @param int $offset
+     *
+     * @return array [string repr, function name, class name or false, isConstructor]
+     */
+    protected static function getCaller($index, $offset = 1)
+    {
+        Assert::greaterThanEq($index, 0);
+
+        $index += $offset + 1;
+
+        $stack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $index + 1);
+        if (!isset($stack[$index])) {
+            throw new \OutOfBoundsException(sprintf('%s is greater than the current call stack', $index - $offset - 1));
         }
-        if ($function === '__set' || $function === '__get') {
-            static::warn(strtoupper($function[2]) . "etting $method", $since, $suggest);
+        $frame = $stack[$index];
 
-            return;
+        if (!isset($frame['class'])) {
+            // Assert the function isn't called directly from a script,
+            // else we would be saying "require() is deprecated" lol.
+            if (!function_exists($frame['function'])) {
+                $frame = $stack[$index - $offset];
+                throw new \InvalidArgumentException(
+                    sprintf('%s::%s() must be called from within a function/method.', $frame['class'], $frame['function'])
+                );
+            }
+
+            return [
+                $frame['function'],
+                $frame['function'],
+                false,
+                false,
+            ];
         }
 
-        static::warn($method . '()', $since, $suggest);
+        $class = $frame['class'];
+        $function = $frame['function'];
+        $constructor = $function === '__construct';
+
+        if ($function === '__call' || $function === '__callStatic') {
+            $frame = debug_backtrace(false, $index + 1)[$index]; // with args
+            $function = $frame['args'][0];
+        }
+
+        return [
+            $class . (!$constructor ? '::' . $function : ''),
+            $function,
+            $class,
+            $constructor,
+        ];
     }
 
     /**

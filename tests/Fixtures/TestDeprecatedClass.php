@@ -15,47 +15,31 @@ class TestDeprecatedClass
 
     public static function foo()
     {
-        Deprecated::method();
+        Deprecated::method(null, \ArrayObject::class);
     }
 
     public function __call($name, $arguments)
     {
-        Deprecated::method();
+        Deprecated::method(null, \ArrayObject::class);
     }
 
     public static function __callStatic($name, $arguments)
     {
-        Deprecated::method();
-    }
-
-    public function __get($name)
-    {
-        Deprecated::method();
-    }
-
-    public function __set($name, $value)
-    {
-        Deprecated::method();
-    }
-
-    public function __isset($name)
-    {
-        Deprecated::method();
-    }
-
-    public function __unset($name)
-    {
-        Deprecated::method();
+        Deprecated::method(null, \ArrayObject::class);
     }
 
     public static function getArrayCopy()
     {
         Deprecated::method(null, \ArrayObject::class);
     }
-}
 
-// @codingStandardsIgnoreLine
-function deprecatedFunction()
-{
-    Deprecated::method();
+    public static function someMethod()
+    {
+        static::deprecated();
+    }
+
+    private static function deprecated()
+    {
+        Deprecated::method(null, \ArrayObject::class, 1);
+    }
 }
