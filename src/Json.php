@@ -42,7 +42,7 @@ final class Json
      *
      * @return string
      */
-    public static function dump($data, $options = self::HUMAN, $depth = 512)
+    public static function dump($data, $options = self::UNESCAPED, $depth = 512)
     {
         $json = @json_encode($data, $options, $depth);
 
