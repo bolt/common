@@ -66,7 +66,7 @@ class ParseException extends \RuntimeException
 
         $message = 'JSON parsing failed: ' . $message;
 
-        return new static($message, $line, $snippet, JSON_ERROR_SYNTAX, $exception);
+        return new static($message, $line, $snippet, JSON_ERROR_SYNTAX);
     }
 
     /**

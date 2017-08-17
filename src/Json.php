@@ -13,6 +13,24 @@ use Seld\JsonLint\ParsingException;
 final class Json
 {
     /**
+     * Dump JSON easy to read for humans.
+     * Shortcut for JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE.
+     */
+    const HUMAN = 448;
+
+    /**
+     * Dump JSON without escaping slashes or unicode.
+     * Shortcut for JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE.
+     */
+    const UNESCAPED = 320;
+
+    /**
+     * Dump JSON safe for HTML.
+     * Shortcut for JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT.
+     */
+    const HTML = 15;
+
+    /**
      * Dumps a array/object into a JSON string.
      *
      * @param mixed $data    Data to encode into a formatted JSON string
@@ -24,22 +42,26 @@ final class Json
      *
      * @return string
      */
-    public static function dump($data, $options = 448, $depth = 512)
+    public static function dump($data, $options = self::UNESCAPED, $depth = 512)
     {
         $json = @json_encode($data, $options, $depth);
 
-        if ($json !== false) {
-            return $json;
-        }
-
         // If UTF-8 error, try to convert and try again before failing.
-        if (json_last_error() === JSON_ERROR_UTF8) {
+        if ($json === false && json_last_error() === JSON_ERROR_UTF8) {
             static::detectAndCleanUtf8($data);
 
             $json = @json_encode($data, $options, $depth);
-            if ($json !== false) {
-                return $json;
+        }
+
+        if ($json !== false) {
+            // Match PHP 7.1 functionality
+            // Escape line terminators with JSON_UNESCAPED_UNICODE unless JSON_UNESCAPED_LINE_TERMINATORS is given
+            if (PHP_VERSION_ID < 70100 && $options & JSON_UNESCAPED_UNICODE && ($options & 2048) === 0) {
+                $json = str_replace("\xe2\x80\xa8", '\\u2028', $json);
+                $json = str_replace("\xe2\x80\xa9", '\\u2029', $json);
             }
+
+            return $json;
         }
 
         throw new DumpException(sprintf('JSON dumping failed: %s', json_last_error_msg()), json_last_error());
@@ -62,10 +84,12 @@ final class Json
             return null;
         }
 
+        $json = (string) $json;
+
         $data = @json_decode($json, true, $depth, $options);
 
-        if ($data === null && ($code = json_last_error()) !== JSON_ERROR_NONE) {
-            if ($code === JSON_ERROR_UTF8 || $code === JSON_ERROR_DEPTH) {
+        if ($data === null && ($json === '' || ($code = json_last_error()) !== JSON_ERROR_NONE)) {
+            if (isset($code) && ($code === JSON_ERROR_UTF8 || $code === JSON_ERROR_DEPTH)) {
                 throw new ParseException(sprintf('JSON parsing failed: %s', json_last_error_msg()), -1, null, $code);
             }
 
@@ -92,8 +116,15 @@ final class Json
             return false;
         }
 
+        $json = (string) $json;
+
+        // valid for PHP 5.x, invalid for PHP 7.x
+        if ($json === '') {
+            return false;
+        }
+
         // Don't call our parse(), because we don't need the extra syntax checking.
-        @json_decode((string) $json);
+        @json_decode($json);
 
         return json_last_error() === JSON_ERROR_NONE;
     }

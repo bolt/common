@@ -22,6 +22,16 @@ class JsonTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], Json::parse('{"foo": "bar"}'));
     }
 
+    public function testParseErrorEmptyString()
+    {
+        $this->expectParseException('', 0);
+    }
+
+    public function testParseErrorObjectEmptyString()
+    {
+        $this->expectParseException(new TestStringable(''), 0);
+    }
+
     public function testParseErrorDetectExtraComma()
     {
         $json = '{
@@ -218,6 +228,16 @@ class JsonTest extends TestCase
         $this->assertJsonFormat('"\\u018c"', $data, 0);
     }
 
+    public function testDumpEscapesLineTerminators()
+    {
+        $this->assertJsonFormat('"JS\\u2029ON ro\\u2028cks"', 'JS ON ro cks', JSON_UNESCAPED_UNICODE);
+        $this->assertJsonFormat('"JS\\u2029ON ro\\u2028cks"', 'JS ON ro cks', JSON_UNESCAPED_UNICODE);
+
+        if (PHP_VERSION_ID >= 70100) {
+            $this->assertJsonFormat('"JS ON ro cks"', 'JS ON ro cks', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS);
+        }
+    }
+
     public function testDumpConvertsInvalidEncodingAsLatin9()
     {
         $data = "\xA4\xA6\xA8\xB4\xB8\xBC\xBD\xBE";
@@ -250,13 +270,9 @@ class JsonTest extends TestCase
         $this->fail('Should have thrown ' . DumpException::class);
     }
 
-    private function assertJsonFormat($json, $data, $options = null)
+    private function assertJsonFormat($json, $data, $options = Json::HUMAN)
     {
-        if ($options === null) {
-            $this->assertEquals($json, Json::dump($data));
-        } else {
-            $this->assertEquals($json, Json::dump($data, $options));
-        }
+        $this->assertEquals($json, Json::dump($data, $options));
     }
 
     public function testDumpFail()
@@ -282,6 +298,8 @@ class JsonTest extends TestCase
     {
         $this->assertFalse(Json::test(null));
         $this->assertFalse(Json::test(123));
+        $this->assertFalse(Json::test(''));
+        $this->assertFalse(Json::test(new TestStringable('')));
         $this->assertTrue(Json::test('{}'));
         $this->assertTrue(Json::test(new TestStringable('{}')));
 
