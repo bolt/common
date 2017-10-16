@@ -3,7 +3,6 @@
 namespace Bolt\Common\Tests;
 
 use Bolt\Common\Ini;
-use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_AssertionFailedError as AssertionFailedError;
 
 class IniTest extends TestCase

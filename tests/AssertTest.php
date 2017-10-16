@@ -3,7 +3,6 @@
 namespace Bolt\Common\Tests;
 
 use Bolt\Common\Assert;
-use PHPUnit\Framework\TestCase;
 
 class AssertTest extends TestCase
 {

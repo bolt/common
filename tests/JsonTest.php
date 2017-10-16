@@ -8,7 +8,6 @@ use Bolt\Common\Json;
 use Bolt\Common\Tests\Fixtures\JsonMocker;
 use Bolt\Common\Tests\Fixtures\TestJsonable;
 use Bolt\Common\Tests\Fixtures\TestStringable;
-use PHPUnit\Framework\TestCase;
 
 class JsonTest extends TestCase
 {

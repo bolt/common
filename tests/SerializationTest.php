@@ -4,7 +4,6 @@ namespace Bolt\Common\Tests;
 
 use Bolt\Common\Exception\DumpException;
 use Bolt\Common\Serialization;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \Bolt\Common\Serialization
