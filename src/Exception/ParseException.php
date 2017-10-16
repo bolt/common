@@ -145,7 +145,7 @@ class ParseException extends \RuntimeException
         $this->message = $this->rawMessage;
 
         $dot = false;
-        if ('.' === substr($this->message, -1)) {
+        if (substr($this->message, -1) === '.') {
             $this->message = substr($this->message, 0, -1);
             $dot = true;
         }
