@@ -3,7 +3,6 @@
 namespace Bolt\Common\Tests;
 
 use Bolt\Common\Ini;
-use PHPUnit_Framework_AssertionFailedError as AssertionFailedError;
 
 class IniTest extends TestCase
 {
@@ -134,10 +133,8 @@ class IniTest extends TestCase
 
     public function testSetInvalidType()
     {
-        $this->setExpectedException(
-            \InvalidArgumentException::class,
-            'ini values must be scalar or null. Got: array'
-        );
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('ini values must be scalar or null. Got: array');
 
         Ini::set(static::NUMERIC_KEY, []);
     }
@@ -148,10 +145,8 @@ class IniTest extends TestCase
             $this->markTestSkipped('HHVM does not disallow this.');
         }
 
-        $this->setExpectedException(
-            \RuntimeException::class,
-            sprintf('Unable to change ini option "%s" to -2.', static::VALIDATED_KEY)
-        );
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(sprintf('Unable to change ini option "%s" to -2.', static::VALIDATED_KEY));
 
         Ini::set(static::VALIDATED_KEY, -2);
     }
@@ -163,10 +158,8 @@ class IniTest extends TestCase
             return;
         }
 
-        $this->setExpectedException(
-            \RuntimeException::class,
-            sprintf('Unable to change ini option "%s" to 5.5.', static::SILENT_ERROR_KEY)
-        );
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(sprintf('Unable to change ini option "%s" to 5.5.', static::SILENT_ERROR_KEY));
 
         Ini::set(static::SILENT_ERROR_KEY, 5.5);
     }
@@ -182,7 +175,9 @@ class IniTest extends TestCase
         } catch (\Exception $e) {
         }
         if (!isset($e)) {
-            throw new AssertionFailedError('Exception should be thrown');
+            $this->fail('Exception should be thrown');
+
+            return;
         }
 
         $this->assertInstanceOf(
@@ -194,20 +189,16 @@ class IniTest extends TestCase
 
     public function testSetNewKey()
     {
-        $this->setExpectedException(
-            \RuntimeException::class,
-            sprintf("The ini option '%s' does not exist. New ini options cannot be added.", static::NONEXISTENT_KEY)
-        );
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(sprintf("The ini option '%s' does not exist. New ini options cannot be added.", static::NONEXISTENT_KEY));
 
         Ini::set(static::NONEXISTENT_KEY, 'foo');
     }
 
     public function testSetUnauthorized()
     {
-        $this->setExpectedException(
-            \RuntimeException::class,
-            sprintf("Unable to change ini option '%s', because it is not editable at runtime.", static::READ_ONLY_KEY)
-        );
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(sprintf("Unable to change ini option '%s', because it is not editable at runtime.", static::READ_ONLY_KEY));
 
         Ini::set(static::READ_ONLY_KEY, true);
     }

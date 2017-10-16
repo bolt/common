@@ -284,7 +284,8 @@ class JsonTest extends TestCase
             return 'Unknown error';
         });
 
-        $this->setExpectedException(DumpException::class, 'JSON dumping failed: Unknown error');
+        $this->expectException(DumpException::class);
+        $this->expectExceptionMessage('JSON dumping failed: Unknown error');
 
         try {
             Json::dump('');
