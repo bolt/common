@@ -10,6 +10,8 @@ class AssertTest extends TestCase
     {
         Assert::isArrayAccessible([1, 2, 3]);
         Assert::isArrayAccessible(new \ArrayObject([1, 2, 3]));
+
+        $this->addToAssertionCount(2);
     }
 
     /**
@@ -32,6 +34,8 @@ class AssertTest extends TestCase
     {
         Assert::isInstanceOfAny(new \ArrayIterator(), [\Iterator::class, \ArrayAccess::class]); // both
         Assert::isInstanceOfAny(new \Exception(), [\Exception::class, \Countable::class]); // one of
+
+        $this->addToAssertionCount(2);
     }
 
     /**
@@ -54,6 +58,8 @@ class AssertTest extends TestCase
     {
         Assert::isIterable([1, 2, 3]);
         Assert::isIterable(new \ArrayObject([1, 2, 3]));
+
+        $this->addToAssertionCount(2);
     }
 
     /**

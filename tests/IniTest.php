@@ -151,6 +151,9 @@ class IniTest extends TestCase
         Ini::set(static::VALIDATED_KEY, -2);
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testSetInvalidValueSilentError()
     {
         // PHP allows setting floats on int keys, HHVM does not.
