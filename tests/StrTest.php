@@ -3,7 +3,6 @@
 namespace Bolt\Common\Tests;
 
 use Bolt\Common\Str;
-use PHPUnit\Framework\TestCase;
 
 class StrTest extends TestCase
 {

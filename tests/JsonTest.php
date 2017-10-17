@@ -8,7 +8,6 @@ use Bolt\Common\Json;
 use Bolt\Common\Tests\Fixtures\JsonMocker;
 use Bolt\Common\Tests\Fixtures\TestJsonable;
 use Bolt\Common\Tests\Fixtures\TestStringable;
-use PHPUnit\Framework\TestCase;
 
 class JsonTest extends TestCase
 {
@@ -285,7 +284,8 @@ class JsonTest extends TestCase
             return 'Unknown error';
         });
 
-        $this->setExpectedException(DumpException::class, 'JSON dumping failed: Unknown error');
+        $this->expectException(DumpException::class);
+        $this->expectExceptionMessage('JSON dumping failed: Unknown error');
 
         try {
             Json::dump('');

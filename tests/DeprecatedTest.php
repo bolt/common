@@ -4,7 +4,6 @@ namespace Bolt\Common\Tests;
 
 use Bolt\Common\Deprecated;
 use Bolt\Common\Tests\Fixtures\TestDeprecatedClass;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @author Carson Full <carsonfull@gmail.com>

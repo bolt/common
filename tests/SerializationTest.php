@@ -4,7 +4,6 @@ namespace Bolt\Common\Tests;
 
 use Bolt\Common\Exception\DumpException;
 use Bolt\Common\Serialization;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \Bolt\Common\Serialization
@@ -26,7 +25,8 @@ class SerializationTest extends TestCase
         } else {
             $message = '/Error serializing value\. Attempted to serialize unserializable builtin class Closure\$Bolt\\\\Common\\\\Tests\\\\SerializationTest::testDumpInvalid;\d+/';
         }
-        $this->setExpectedExceptionRegExp(DumpException::class, $message);
+        $this->expectException(DumpException::class);
+        $this->expectExceptionMessageRegExp($message);
 
         Serialization::dump(function () {});
     }
