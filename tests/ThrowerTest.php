@@ -3,7 +3,6 @@
 namespace Bolt\Common\Tests;
 
 use Bolt\Common\Thrower;
-use PHPUnit\Framework\TestCase;
 
 class ThrowerTest extends TestCase
 {
