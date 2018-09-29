@@ -6,20 +6,22 @@
         {
             "name": "Carson Full",
             "email": "carsonfull@gmail.com"
+        },
+        {
+            "name": "Bob den Otter",
+            "email": "bob@twokings.nl"
         }
     ],
     "require": {
-        "php": "^5.5 || ^7.0",
+        "php": "^7.1",
         "seld/jsonlint": "^1.4",
-        "symfony/polyfill-php70": "^1.4",
-        "symfony/polyfill-php71": "^1.0",
         "webmozart/assert": "^1.2"
     },
     "require-dev": {
         "bolt/codingstyle": "^2.0@dev",
         "escapestudios/symfony2-coding-standard": "^3.0@dev",
         "friendsofphp/php-cs-fixer": "^2.4",
-        "phpunit/phpunit": "^4.8 || ^5.7 || ^6.4",
+        "phpunit/phpunit": "^6.4",
         "symfony/phpunit-bridge": "^3.3"
     },
     "scripts": {

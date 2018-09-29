@@ -11,6 +11,8 @@ should always throw exceptions instead of triggering errors/warnings/notices
 (excluding deprecation warnings).
 
 Table of Contents:
+
+- [Arr](#arr)
 - [Assert](#assert)
 - [Deprecated](#deprecated)
 - [Ini](#ini)
@@ -20,8 +22,9 @@ Table of Contents:
 
 -----
 
-## `Assert`
+- [Arr](#arr)
 
+- [Assert](#assert)
 Additional assertions built on `Webmozart\Assert`
 
 
