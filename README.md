@@ -22,9 +22,10 @@ Table of Contents:
 
 -----
 
-- [Arr](#arr)
+## Arr
 
-- [Assert](#assert)
+## Assert
+
 Additional assertions built on `Webmozart\Assert`
 
 
