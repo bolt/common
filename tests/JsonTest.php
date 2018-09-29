@@ -188,7 +188,7 @@ class JsonTest extends TestCase
 
     public function testDumpUnicode()
     {
-        if (!function_exists('mb_convert_encoding')) {
+        if (!\function_exists('mb_convert_encoding')) {
             $this->markTestSkipped('Test requires the mbstring extension');
         }
 
@@ -201,7 +201,7 @@ class JsonTest extends TestCase
 
     public function testDumpOnlyUnicode()
     {
-        if (!function_exists('mb_convert_encoding')) {
+        if (!\function_exists('mb_convert_encoding')) {
             $this->markTestSkipped('Test requires the mbstring extension');
         }
 
@@ -232,7 +232,7 @@ class JsonTest extends TestCase
         $this->assertJsonFormat('"JS\\u2029ON ro\\u2028cks"', 'JS ON ro cks', JSON_UNESCAPED_UNICODE);
         $this->assertJsonFormat('"JS\\u2029ON ro\\u2028cks"', 'JS ON ro cks', JSON_UNESCAPED_UNICODE);
 
-        if (PHP_VERSION_ID >= 70100) {
+        if (\PHP_VERSION_ID >= 70100) {
             $this->assertJsonFormat('"JS ON ro cks"', 'JS ON ro cks', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS);
         }
     }

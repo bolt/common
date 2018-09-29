@@ -14,7 +14,7 @@ class Assert extends \Webmozart\Assert\Assert
 {
     public static function isArrayAccessible($value, $message = '')
     {
-        if (!is_array($value) && !($value instanceof \ArrayAccess)) {
+        if (!\is_array($value) && !($value instanceof \ArrayAccess)) {
             static::reportInvalidArgument(sprintf(
                 $message ?: 'Expected an array accessible. Got: %s',
                 static::typeToString($value)

@@ -28,7 +28,7 @@ class Thrower
     {
         static::set();
         try {
-            return call_user_func_array($callable, array_slice(func_get_args(), 1));
+            return \call_user_func_array($callable, \array_slice(\func_get_args(), 1));
         } finally {
             restore_error_handler();
         }

@@ -20,7 +20,7 @@ class SerializationTest extends TestCase
 
     public function testDumpInvalid()
     {
-        if (!defined('HHVM_VERSION')) {
+        if (!\defined('HHVM_VERSION')) {
             $message = "/Error serializing value\. Serialization of 'Closure' is not allowed/";
         } else {
             $message = '/Error serializing value\. Attempted to serialize unserializable builtin class Closure\$Bolt\\\\Common\\\\Tests\\\\SerializationTest::testDumpInvalid;\d+/';
@@ -52,7 +52,7 @@ class SerializationTest extends TestCase
      */
     public function testParseClassNotFound()
     {
-        if (defined('HHVM_VERSION')) {
+        if (\defined('HHVM_VERSION')) {
             $this->markTestSkipped(
                 'HHVM has not implemented "unserialize_callback_func", meaning ' .
                 '__PHP_Incomplete_Class could be returned at any level and we are not going to look for them.'

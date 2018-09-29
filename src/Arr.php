@@ -3,9 +3,6 @@
 namespace Bolt\Common;
 
 use ArrayAccess;
-use Bolt\Common\Assert;
-use Bolt\Common\Deprecated;
-use Bolt\Common\Thrower;
 use InvalidArgumentException;
 use RuntimeException;
 use Traversable;
@@ -32,12 +29,8 @@ class Arr
      */
     public static function from($iterable)
     {
-        if (is_array($iterable)) {
+        if (\is_array($iterable)) {
             return $iterable;
-        }
-        // Don't mean to play favorites, but want to optimize where we can.
-        if ($iterable instanceof ImmutableBag) {
-            return $iterable->toArray();
         }
         if ($iterable instanceof Traversable) {
             return iterator_to_array($iterable);
@@ -116,11 +109,11 @@ class Arr
 
             if ($columnKey === null) {
                 $value = $row;
-            } elseif (is_array($row) && array_key_exists($columnKey, $row)) {
+            } elseif (\is_array($row) && array_key_exists($columnKey, $row)) {
                 $value = $row[$columnKey];
             } elseif ($row instanceof ArrayAccess && isset($row[$columnKey])) {
                 $value = $row[$columnKey];
-            } elseif (is_object($row) && isset($row->{$columnKey})) {
+            } elseif (\is_object($row) && isset($row->{$columnKey})) {
                 $value = $row->{$columnKey};
             } else {
                 continue;
@@ -132,13 +125,13 @@ class Arr
                  * For ArrayAccess we assume devs are smarter and don't have this edge case. Regardless, we don't have
                  * another way to check so it's up to them.
                  */
-                if (is_array($row) && array_key_exists($indexKey, $row)) {
+                if (\is_array($row) && array_key_exists($indexKey, $row)) {
                     $keySet = true;
                     $key = (string) $row[$indexKey];
                 } elseif ($row instanceof ArrayAccess && isset($row[$indexKey])) {
                     $keySet = true;
                     $key = (string) $row[$indexKey];
-                } elseif (is_object($row) && isset($row->{$indexKey})) {
+                } elseif (\is_object($row) && isset($row->{$indexKey})) {
                     $keySet = true;
                     $key = (string) $row->{$indexKey};
                 }
@@ -185,7 +178,7 @@ class Arr
         $path = explode('/', $path);
 
         while (($part = array_shift($path)) !== null) {
-            if (!($data instanceof ArrayAccess) && !is_array($data)) {
+            if (!($data instanceof ArrayAccess) && !\is_array($data)) {
                 return false;
             }
             if (!(isset($data[$part]) || array_key_exists($part, $data))) {
@@ -225,7 +218,7 @@ class Arr
         $path = explode('/', $path);
 
         while (($part = array_shift($path)) !== null) {
-            if ((!is_array($data) && !($data instanceof ArrayAccess)) || !isset($data[$part])) {
+            if ((!\is_array($data) && !($data instanceof ArrayAccess)) || !isset($data[$part])) {
                 return $default;
             }
             $data = $data[$part];
@@ -259,17 +252,14 @@ class Arr
      * <br>
      * Note: To set values in arrays that are in `ArrayAccess` objects their
      * `offsetGet()` method needs to be able to return arrays by reference.
-     * See {@see MutableBag} for an example of this.
      *
      * This code is adapted from Michael Dowling in his Guzzle library.
      *
-     * @param array|ArrayAccess $data  Data to modify by reference
-     * @param string            $path  Path to set
-     * @param mixed             $value Value to set at the key
+     * @param array|ArrayAccess $data Data to modify by reference
+     * @param string $path Path to set
+     * @param mixed $value Value to set at the key
      *
-     * @throws \RuntimeException when trying to set a path that travels through a scalar value
-     * @throws \RuntimeException when trying to set a value in an array that is in an `ArrayAccess` object
-     *                           which cannot retrieve arrays by reference
+     * @throws \ErrorException
      */
     public static function set(&$data, $path, $value)
     {
@@ -278,7 +268,7 @@ class Arr
 
         $queue = explode('/', $path);
         // Optimization for simple sets.
-        if (count($queue) === 1) {
+        if (\count($queue) === 1) {
             if ($path === '[]') {
                 $data[] = $value;
             } elseif (static::$unsetMarker && $value === static::$unsetMarker) {
@@ -293,7 +283,7 @@ class Arr
         $invalidKey = null;
         $current = &$data;
         while (($key = array_shift($queue)) !== null) {
-            if (!is_array($current) && !($current instanceof ArrayAccess)) {
+            if (!\is_array($current) && !($current instanceof ArrayAccess)) {
                 throw new RuntimeException(
                     sprintf(
                         "Cannot set '%s', because '%s' is already set and not an array or an object implementing ArrayAccess.",
@@ -314,10 +304,6 @@ class Arr
                 return;
             }
 
-            if ($current instanceof Bag && !($current instanceof MutableBag)) {
-                Deprecated::warn('Mutating items in a ' . Bag::class, 1.1, 'Use a ' . MutableBag::class . ' instead.');
-            }
-
             if (!isset($current[$key])) {
                 $current[$key] = [];
             }
@@ -326,11 +312,10 @@ class Arr
             if ($current instanceof ArrayAccess && !static::canReturnArraysByReference($current, $key, $next, $e)) {
                 throw new RuntimeException(
                     sprintf(
-                        "Cannot set '%s', because '%s' is an %s which does not return arrays by reference from its offsetGet() method. See %s for an example of how to do this.",
+                        "Cannot set '%s', because '%s' is an %s which does not return arrays by reference from its offsetGet() method.",
                         $path,
                         $invalidKey,
-                        get_class($current),
-                        MutableBag::class
+                        \get_class($current)
                     ),
                     0,
                     $e
@@ -365,17 +350,13 @@ class Arr
      * <br>
      * Note: To remove values in arrays that are in `ArrayAccess` objects their
      * `offsetGet()` method needs to be able to return arrays by reference.
-     * See {@see MutableBag} for an example of this.
      *
-     * @param array|ArrayAccess $data    Data to retrieve remove value from
-     * @param string            $path    Path to traverse
-     * @param mixed|null        $default Default value to return if key does not exist
-     *
-     * @throws \RuntimeException when trying to remove a path that travels through a scalar value
-     * @throws \RuntimeException when trying to remove a value in an array that is in an `ArrayAccess` object
-     *                           which cannot retrieve arrays by reference
+     * @param array|ArrayAccess $data Data to retrieve remove value from
+     * @param string $path Path to traverse
+     * @param mixed|null $default Default value to return if key does not exist
      *
      * @return mixed
+     * @throws \ErrorException
      */
     public static function remove(&$data, $path, $default = null)
     {
@@ -410,7 +391,7 @@ class Arr
      */
     public static function isAccessible($value)
     {
-        return $value instanceof ArrayAccess || is_array($value);
+        return $value instanceof ArrayAccess || \is_array($value);
     }
 
     /**
@@ -443,11 +424,11 @@ class Arr
         if ($iterable instanceof Traversable) {
             $iterable = iterator_to_array($iterable);
         }
-        if (!is_array($iterable) || $iterable === []) {
+        if (!\is_array($iterable) || $iterable === []) {
             return false;
         }
 
-        return array_keys($iterable) !== range(0, count($iterable) - 1);
+        return array_keys($iterable) !== range(0, \count($iterable) - 1);
     }
 
     /**
@@ -477,6 +458,7 @@ class Arr
      * @param callable $callable Function is passed `($value, $key)`
      *
      * @return array
+     * @throws \ReflectionException
      */
     public static function mapRecursive($iterable, callable $callable)
     {
@@ -547,7 +529,7 @@ class Arr
             if ($value instanceof Traversable) {
                 $value = iterator_to_array($value);
             }
-            if (is_array($value) && static::isAssociative($value)
+            if (\is_array($value) && static::isAssociative($value)
                 && isset($merged[$key]) && \is_iterable($merged[$key])
             ) {
                 $merged[$key] = static::replaceRecursive($merged[$key], $value);
@@ -568,22 +550,18 @@ class Arr
     /**
      * Determine whether the ArrayAccess object can return by reference.
      *
-     * @param ArrayAccess      $obj
-     * @param string           $key   The key to try with
+     * @param ArrayAccess $obj
+     * @param string $key The key to try with
      * @param ArrayAccess|null $value The value if it needed to be fetched
-     * @param \ErrorException  $ex
-     *
-     * @throws \ErrorException
+     * @param \ErrorException $ex
      *
      * @return bool
+     * @throws \ErrorException
+     * @throws \ReflectionException
      */
     private static function canReturnArraysByReference(ArrayAccess $obj, $key, &$value, &$ex)
     {
         static $supportedClasses = [
-            // Add our classes by default to help with performance since we can
-            Bag::class                     => true, // but deprecated
-            MutableBag::class              => true,
-
             // These fail reflection check below even though they work fine :rolleyes:
             \ArrayObject::class            => true,
             \ArrayIterator::class          => true,
@@ -591,7 +569,7 @@ class Arr
         ];
         static $noErrors = [];
 
-        $class = get_class($obj);
+        $class = \get_class($obj);
 
         /*
          * Check to see if offsetGet() is defined to return reference (with "&" before method name).
@@ -635,7 +613,7 @@ class Arr
         }
 
         // We cannot validate this result because objects are always returned by reference (and scalars do not matter).
-        if (!is_array($value1)) {
+        if (!\is_array($value1)) {
             // return value (via parameter) so set() doesn't have to fetch the item again.
             // We cannot do this if is an array because it will be the value instead of the reference.
             $value = $value1;

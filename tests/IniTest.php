@@ -69,7 +69,7 @@ class IniTest extends TestCase
 
     public function testGetNumeric()
     {
-        if (!defined('HHVM_VERSION')) {
+        if (!\defined('HHVM_VERSION')) {
             ini_set(static::NUMERIC_KEY, '');
             $this->assertSame(4.0, Ini::getNumeric(static::NUMERIC_KEY, 4.0));
         }
@@ -141,7 +141,7 @@ class IniTest extends TestCase
 
     public function testSetInvalidValue()
     {
-        if (defined('HHVM_VERSION')) {
+        if (\defined('HHVM_VERSION')) {
             $this->markTestSkipped('HHVM does not disallow this.');
         }
 
@@ -157,7 +157,7 @@ class IniTest extends TestCase
     public function testSetInvalidValueSilentError()
     {
         // PHP allows setting floats on int keys, HHVM does not.
-        if (!defined('HHVM_VERSION')) {
+        if (!\defined('HHVM_VERSION')) {
             return;
         }
 
@@ -169,7 +169,7 @@ class IniTest extends TestCase
 
     public function testSetInvalidValueErrorTriggered()
     {
-        if (defined('HHVM_VERSION')) {
+        if (\defined('HHVM_VERSION')) {
             $this->markTestSkipped('HHVM does not trigger error.');
         }
 

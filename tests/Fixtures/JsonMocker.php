@@ -105,22 +105,22 @@ PHP;
 
     public function json_decode($value, $options = 0, $depth = 512)
     {
-        return call_user_func_array($this->decoder, func_get_args());
+        return \call_user_func_array($this->decoder, \func_get_args());
     }
 
     public function json_encode($json, $assoc = false, $depth = 512, $options = 0)
     {
-        return call_user_func_array($this->encoder, func_get_args());
+        return \call_user_func_array($this->encoder, \func_get_args());
     }
 
     public function json_last_error()
     {
-        return call_user_func($this->lastCodeGetter);
+        return \call_user_func($this->lastCodeGetter);
     }
 
     public function json_last_error_msg()
     {
-        return call_user_func($this->lastMsgGetter);
+        return \call_user_func($this->lastMsgGetter);
     }
 }
 

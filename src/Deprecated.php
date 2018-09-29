@@ -25,14 +25,14 @@ class Deprecated
      * Will trigger: "Foo::world() is deprecated since 3.3 and will be removed in 4.0. Use hello() instead."
      *
      * @param float|null $since   The version it was deprecated in
-     * @param string     $suggest A method or class or suggestion of what to use instead.
+     * @param string     $suggest a method or class or suggestion of what to use instead.
      *                            If it is a class and the class has a matching method name,
-     *                            that will be the suggestion.
+     *                            that will be the suggestion
      * @param string|int $subject The method or class name or the index of the call stack to reference
      */
     public static function method($since = null, $suggest = '', $subject = 0)
     {
-        if ($subject === null || is_int($subject)) {
+        if ($subject === null || \is_int($subject)) {
             list($subject, $function, $class, $constructor) = static::getCaller($subject ?: 0);
         } else {
             Assert::stringNotEmpty($subject, 'Expected a non-empty string. Got: %s');
@@ -82,7 +82,7 @@ class Deprecated
         if (!isset($frame['class'])) {
             // Assert the function isn't called directly from a script,
             // else we would be saying "require() is deprecated" lol.
-            if (!function_exists($frame['function'])) {
+            if (!\function_exists($frame['function'])) {
                 $frame = $stack[$index - $offset];
                 throw new \InvalidArgumentException(
                     sprintf('%s::%s() must be called from within a function/method.', $frame['class'], $frame['function'])
