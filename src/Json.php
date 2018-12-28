@@ -103,6 +103,31 @@ final class Json
         return $data;
     }
 
+
+    /**
+     * Find a scalar value in provided string/json/array
+     *
+     * @param $input
+     *
+     * @return mixed
+     */
+    public static function findScalar($input)
+    {
+        if (is_iterable($input)) {
+            return self::findScalar(current($input));
+        }
+
+        if (self::test($input)) {
+            return self::findScalar(self::parse($input));
+        }
+
+        if (!is_scalar($input)) {
+            throw new \Exception("Can't find a scalar in provided input");
+        }
+
+        return $input;
+    }    
+    
     /**
      * Return whether the given string is JSON.
      *
