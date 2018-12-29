@@ -255,9 +255,9 @@ class Arr
      *
      * This code is adapted from Michael Dowling in his Guzzle library.
      *
-     * @param array|ArrayAccess $data Data to modify by reference
-     * @param string $path Path to set
-     * @param mixed $value Value to set at the key
+     * @param array|ArrayAccess $data  Data to modify by reference
+     * @param string            $path  Path to set
+     * @param mixed             $value Value to set at the key
      *
      * @throws \ErrorException
      */
@@ -351,12 +351,13 @@ class Arr
      * Note: To remove values in arrays that are in `ArrayAccess` objects their
      * `offsetGet()` method needs to be able to return arrays by reference.
      *
-     * @param array|ArrayAccess $data Data to retrieve remove value from
-     * @param string $path Path to traverse
-     * @param mixed|null $default Default value to return if key does not exist
+     * @param array|ArrayAccess $data    Data to retrieve remove value from
+     * @param string            $path    Path to traverse
+     * @param mixed|null        $default Default value to return if key does not exist
+     *
+     * @throws \ErrorException
      *
      * @return mixed
-     * @throws \ErrorException
      */
     public static function remove(&$data, $path, $default = null)
     {
@@ -457,8 +458,9 @@ class Arr
      * @param iterable $iterable
      * @param callable $callable Function is passed `($value, $key)`
      *
-     * @return array
      * @throws \ReflectionException
+     *
+     * @return array
      */
     public static function mapRecursive($iterable, callable $callable)
     {
@@ -550,14 +552,15 @@ class Arr
     /**
      * Determine whether the ArrayAccess object can return by reference.
      *
-     * @param ArrayAccess $obj
-     * @param string $key The key to try with
+     * @param ArrayAccess      $obj
+     * @param string           $key   The key to try with
      * @param ArrayAccess|null $value The value if it needed to be fetched
-     * @param \ErrorException $ex
+     * @param \ErrorException  $ex
      *
-     * @return bool
      * @throws \ErrorException
      * @throws \ReflectionException
+     *
+     * @return bool
      */
     private static function canReturnArraysByReference(ArrayAccess $obj, $key, &$value, &$ex)
     {

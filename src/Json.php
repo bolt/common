@@ -103,11 +103,12 @@ final class Json
         return $data;
     }
 
-
     /**
-     * Find a scalar value in provided string/json/array
+     * Find a scalar value in provided string/json/array.
      *
      * @param $input
+     *
+     * @throws \Exception
      *
      * @return mixed
      */
@@ -126,8 +127,34 @@ final class Json
         }
 
         return $input;
-    }    
-    
+    }
+
+    /**
+     * Find an array in provided string/json/array.
+     *
+     * @param $input
+     *
+     * @throws \Exception
+     *
+     * @return mixed
+     */
+    public static function findArray($input)
+    {
+        if (is_iterable($input) && self::test(current($input))) {
+            return self::findArray(current($input));
+        }
+
+        if (self::test($input)) {
+            return self::findArray(self::parse($input));
+        }
+
+        if (!is_iterable($input)) {
+            throw new \Exception("Can't find an array in provided input");
+        }
+
+        return $input;
+    }
+
     /**
      * Return whether the given string is JSON.
      *
