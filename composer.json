@@ -15,11 +15,12 @@
     "require": {
         "php": "^7.1",
         "seld/jsonlint": "^1.4",
-        "webmozart/assert": "^1.2"
+        "webmozart/assert": "^1.2",
+        "squizlabs/php_codesniffer": "^3.4"
     },
     "require-dev": {
         "bolt/codingstyle": "^2.0@dev",
-        "escapestudios/symfony2-coding-standard": "^3.0@dev",
+        "escapestudios/symfony2-coding-standard": "^3.4",
         "friendsofphp/php-cs-fixer": "^2.4",
         "phpunit/phpunit": "^6.4",
         "symfony/phpunit-bridge": "^3.3"
