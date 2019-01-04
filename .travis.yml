@@ -11,7 +11,7 @@ matrix:
     - php: 7.3
       env: COMPOSER_FLAGS="--ignore-platform-reqs"
     - php: nightly
-      env: COMPOSER_FLAGS="--ignore-platform-reqs" PHP_CS_FIXER_IGNORE_ENV=1
+      env: COMPOSER_FLAGS="--ignore-platform-reqs"
   allow_failures:
     - php: nightly
 
@@ -29,7 +29,7 @@ script:
   # PHP CodeSniffer
   - vendor/bin/phpcs -p --report=summary
   # PHP CS Fixer
-  - vendor/bin/php-cs-fixer fix --cache-file cs_cache/php_cs_fixer --dry-run
+  - PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix --cache-file cs_cache/php_cs_fixer --dry-run
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
