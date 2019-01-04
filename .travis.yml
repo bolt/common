@@ -3,15 +3,14 @@ language: php
 sudo: false
 dist: trusty
 
-php:
-  - 7.1
-  - 7.2
-  - nightly
-
 matrix:
   fast_finish: true
   include:
+    - php: 7.1
+    - php: 7.2
     - php: 7.3
+      env: COMPOSER_FLAGS="--ignore-platform-reqs"
+    - php: nightly
       env: COMPOSER_FLAGS="--ignore-platform-reqs"
   allow_failures:
     - php: nightly
@@ -22,7 +21,7 @@ before_install:
   - mv ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini{,.disabled} || echo "xdebug not available"
   
 install:
-  - composer install --no-interaction
+  - composer install --no-interaction $COMPOSER_FLAGS
 
 script:
   # PHPUnit
