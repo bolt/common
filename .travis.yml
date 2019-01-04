@@ -4,23 +4,14 @@ sudo: false
 dist: trusty
 
 php:
-  - 5.5
-  - 5.6
-  - 7.0
   - 7.1
   - 7.2
   - nightly
-  - hhvm
 
 matrix:
   fast_finish: true
   allow_failures:
     - php: nightly
-    - php: hhvm
-
-before_install:
-  # Remove PHP CS Fixer for incompatible PHP versions
-  - if [[ $TRAVIS_PHP_VERSION == "5.5" || $TRAVIS_PHP_VERSION == "nightly" || $TRAVIS_PHP_VERSION == "hhvm" ]]; then composer remove friendsofphp/php-cs-fixer --dev --no-update; fi
 
 before_script:
   # Set up Composer
@@ -32,8 +23,8 @@ script:
   - vendor/bin/phpunit --coverage-clover=coverage.xml
   # PHP CodeSniffer
   - vendor/bin/phpcs -p --report=summary
-  # PHP CS Fixer (if compatible)
-  - if [[ $TRAVIS_PHP_VERSION != "5.5" && $TRAVIS_PHP_VERSION != "nightly" && $TRAVIS_PHP_VERSION != "hhvm" ]]; then vendor/bin/php-cs-fixer fix --cache-file cs_cache/php_cs_fixer --dry-run; fi
+  # PHP CS Fixer
+  - vendor/bin/php-cs-fixer fix --cache-file cs_cache/php_cs_fixer --dry-run
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
