@@ -6,18 +6,22 @@ dist: trusty
 php:
   - 7.1
   - 7.2
-  - 7.3
   - nightly
 
 matrix:
   fast_finish: true
+  include:
+    - php: 7.3
+      env: COMPOSER_FLAGS="--ignore-platform-reqs"
   allow_failures:
-    - php: 7.3 # PHP CS Fixer does not support it yet
     - php: nightly
 
-before_script:
+before_install:
   # Set up Composer
   - composer self-update || true
+  - mv ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini{,.disabled} || echo "xdebug not available"
+  
+install:
   - composer install --no-interaction
 
 script:
