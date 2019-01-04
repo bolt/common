@@ -11,7 +11,7 @@ matrix:
     - php: 7.3
       env: COMPOSER_FLAGS="--ignore-platform-reqs"
     - php: nightly
-      env: COMPOSER_FLAGS="--ignore-platform-reqs"
+      env: COMPOSER_FLAGS="--ignore-platform-reqs" PHP_CS_FIXER_IGNORE_ENV=1
   allow_failures:
     - php: nightly
 
