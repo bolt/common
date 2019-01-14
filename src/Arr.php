@@ -164,7 +164,7 @@ class Arr
      * @param array|ArrayAccess $data Data to check values from
      * @param string            $path Path to traverse and check keys from
      */
-    public static function has($data, $path): bool
+    public static function has($data, string $path): bool
     {
         Assert::isArrayAccessible($data);
         Assert::stringNotEmpty($path);
@@ -204,7 +204,7 @@ class Arr
      *
      * @return mixed|null
      */
-    public static function get($data, $path, $default = null)
+    public static function get($data, string $path, $default = null)
     {
         Assert::isArrayAccessible($data);
         Assert::stringNotEmpty($path);
@@ -255,7 +255,7 @@ class Arr
      *
      * @throws \ErrorException
      */
-    public static function set(&$data, $path, $value): void
+    public static function set(&$data, string $path, $value): void
     {
         Assert::isArrayAccessible($data);
         Assert::stringNotEmpty($path);
@@ -351,7 +351,7 @@ class Arr
      *
      * @throws \ErrorException
      */
-    public static function remove(&$data, $path, $default = null)
+    public static function remove(&$data, string $path, $default = null)
     {
         if (! static::$unsetMarker) {
             static::$unsetMarker = new \stdClass();

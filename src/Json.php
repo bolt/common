@@ -70,13 +70,12 @@ final class Json
     /**
      * Parses JSON into a PHP array.
      *
-     * @param string $json    The JSON string
-     * @param int    $options Bitmask of JSON decode options
-     * @param int    $depth   Recursion depth
+     * @param int $options Bitmask of JSON decode options
+     * @param int $depth   Recursion depth
      *
      * @throws ParseException If the JSON is not valid
      */
-    public static function parse($json, $options = 0, $depth = 512): array
+    public static function parse(?string $json = null, int $options = 0, int $depth = 512): ?array
     {
         if ($json === null) {
             return null;

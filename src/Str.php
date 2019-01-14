@@ -8,13 +8,8 @@ class Str
 {
     /**
      * Replaces the first occurrence of the $search text on the $subject.
-     *
-     * @param string $subject
-     * @param string $search
-     * @param string $replace
-     * @param bool   $caseSensitive
      */
-    public static function replaceFirst($subject, $search, $replace, $caseSensitive = true): string
+    public static function replaceFirst(string $subject, string $search, string $replace, bool $caseSensitive = true): string
     {
         $pos = $caseSensitive ? mb_strpos($subject, $search) : mb_stripos($subject, $search);
         if ($pos === false) {
@@ -26,13 +21,8 @@ class Str
 
     /**
      * Replaces the last occurrence of the $search text on the $subject.
-     *
-     * @param string $subject
-     * @param string $search
-     * @param string $replace
-     * @param bool   $caseSensitive
      */
-    public static function replaceLast($subject, $search, $replace, $caseSensitive = true): string
+    public static function replaceLast(string $subject, string $search, string $replace, bool $caseSensitive = true): string
     {
         $pos = $caseSensitive ? mb_strrpos($subject, $search) : mb_strripos($subject, $search);
         if ($pos === false) {
@@ -44,24 +34,16 @@ class Str
 
     /**
      * Removes the first occurrence of the $search text on the $subject.
-     *
-     * @param string $subject
-     * @param string $search
-     * @param bool   $caseSensitive
      */
-    public static function removeFirst($subject, $search, $caseSensitive = true): string
+    public static function removeFirst(string $subject, string $search, bool $caseSensitive = true): string
     {
         return static::replaceFirst($subject, $search, '', $caseSensitive);
     }
 
     /**
      * Removes the last occurrence of the $search text on the $subject.
-     *
-     * @param string $subject
-     * @param string $search
-     * @param bool   $caseSensitive
      */
-    public static function removeLast($subject, $search, $caseSensitive = true): string
+    public static function removeLast(string $subject, string $search, bool $caseSensitive = true): string
     {
         return static::replaceLast($subject, $search, '', $caseSensitive);
     }
@@ -75,7 +57,7 @@ class Str
      *
      * @throws \InvalidArgumentException
      */
-    public static function splitFirst($subject, $delimiter): string
+    public static function splitFirst(string $subject, string $delimiter): string
     {
         Assert::notEmpty($delimiter);
 
@@ -93,7 +75,7 @@ class Str
      *
      * @throws \InvalidArgumentException
      */
-    public static function splitLast($subject, $delimiter): string
+    public static function splitLast(string $subject, string $delimiter): string
     {
         Assert::notEmpty($delimiter);
 
@@ -104,12 +86,8 @@ class Str
 
     /**
      * Returns whether the subjects ends with the search string.
-     *
-     * @param string $subject
-     * @param string $search
-     * @param bool   $caseSensitive
      */
-    public static function endsWith($subject, $search, $caseSensitive = true): bool
+    public static function endsWith(string $subject, string $search, bool $caseSensitive = true): bool
     {
         if (! $caseSensitive) {
             $subject = mb_strtolower($subject);
@@ -144,7 +122,7 @@ class Str
      *
      * @return string The humanized text
      */
-    public static function humanize($text): string
+    public static function humanize(string $text): string
     {
         return ucfirst(trim(mb_strtolower(preg_replace(['/([A-Z])/', '/[_\s]+/'], ['_$1', ' '], $text))));
     }
@@ -157,7 +135,7 @@ class Str
      *
      * @return string The camel cased text
      */
-    public static function camelCase($text, $lowercaseFirstChar = false): string
+    public static function camelCase(string $text, bool $lowercaseFirstChar = false): string
     {
         $text = strtr(ucwords(strtr($text, [
             '_' => ' ',
@@ -178,7 +156,7 @@ class Str
      *
      * @return string The snake cased text
      */
-    public static function snakeCase($text): string
+    public static function snakeCase(string $text): string
     {
         return mb_strtolower(
             preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], ['\\1_\\2', '\\1_\\2'], $text)

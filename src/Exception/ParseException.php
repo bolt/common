@@ -21,10 +21,9 @@ class ParseException extends \RuntimeException
      * @param string      $message    The error message
      * @param int         $parsedLine The line where the error occurred
      * @param string|null $snippet    The snippet of code near the problem
-     * @param int         $code       The code
      * @param \Throwable  $previous   The previous exception
      */
-    public function __construct($message, $parsedLine = -1, $snippet = null, $code = 0, $previous = null)
+    public function __construct(string $message, int $parsedLine = -1, ?string $snippet = null, int $code = 0, ?\Throwable $previous = null)
     {
         $this->parsedLine = $parsedLine;
         $this->snippet = $snippet;
@@ -82,7 +81,7 @@ class ParseException extends \RuntimeException
      *
      * @param string $rawMessage
      */
-    public function setRawMessage($rawMessage): void
+    public function setRawMessage(string $rawMessage): void
     {
         $this->rawMessage = $rawMessage;
 

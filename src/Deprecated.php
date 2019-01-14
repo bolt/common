@@ -104,7 +104,7 @@ class Deprecated
         $constructor = $function === '__construct';
 
         if ($function === '__call' || $function === '__callStatic') {
-            $frame = debug_backtrace(false, $index + 1)[$index]; // with args
+            $frame = debug_backtrace(0, $index + 1)[$index]; // with args
             $function = $frame['args'][0];
         }
 
