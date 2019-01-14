@@ -1,6 +1,6 @@
 {
     "name": "bolt/common",
-    "description": "Common utilities for all Bolt libraries",
+    "description": "🧰 Common utilities for all Bolt libraries",
     "license": "MIT",
     "authors": [
         {
