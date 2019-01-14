@@ -24,12 +24,8 @@ install:
   - composer install --no-interaction $COMPOSER_FLAGS
 
 script:
-  # PHPUnit
-  - vendor/bin/phpunit --coverage-clover=coverage.xml
-  # PHP CodeSniffer
-  - vendor/bin/phpcs -p --report=summary
-  # PHP CS Fixer
-  - PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix --cache-file cs_cache/php_cs_fixer --dry-run
+  - ./vendor/bin/phpunit --coverage-clover=coverage.xml
+  - ./vendor/bin/ecs check src
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

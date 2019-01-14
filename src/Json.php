@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bolt\Common;
 
 use Bolt\Common\Exception\DumpException;
@@ -16,19 +18,19 @@ final class Json
      * Dump JSON easy to read for humans.
      * Shortcut for JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE.
      */
-    const HUMAN = 448;
+    public const HUMAN = 448;
 
     /**
      * Dump JSON without escaping slashes or unicode.
      * Shortcut for JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE.
      */
-    const UNESCAPED = 320;
+    public const UNESCAPED = 320;
 
     /**
      * Dump JSON safe for HTML.
      * Shortcut for JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT.
      */
-    const HTML = 15;
+    public const HTML = 15;
 
     /**
      * Dumps a array/object into a JSON string.
@@ -39,10 +41,8 @@ final class Json
      * @param int   $depth   Set the maximum depth. Must be greater than zero.
      *
      * @throws DumpException If dumping fails
-     *
-     * @return string
      */
-    public static function dump($data, $options = self::UNESCAPED, $depth = 512)
+    public static function dump($data, $options = self::UNESCAPED, $depth = 512): string
     {
         $json = @json_encode($data, $options, $depth);
 
@@ -75,10 +75,8 @@ final class Json
      * @param int    $depth   Recursion depth
      *
      * @throws ParseException If the JSON is not valid
-     *
-     * @return array
      */
-    public static function parse($json, $options = 0, $depth = 512)
+    public static function parse($json, $options = 0, $depth = 512): array
     {
         if ($json === null) {
             return null;
@@ -88,7 +86,8 @@ final class Json
 
         $data = @json_decode($json, true, $depth, $options);
 
-        if ($data === null && ($json === '' || ($code = json_last_error()) !== JSON_ERROR_NONE)) {
+        if ($data === null && ($json === '' || (json_last_error()) !== JSON_ERROR_NONE)) {
+            $code = json_last_error();
             if (isset($code) && ($code === JSON_ERROR_UTF8 || $code === JSON_ERROR_DEPTH)) {
                 throw new ParseException(sprintf('JSON parsing failed: %s', json_last_error_msg()), -1, null, $code);
             }
@@ -106,11 +105,7 @@ final class Json
     /**
      * Find a scalar value in provided string/json/array.
      *
-     * @param $input
-     *
      * @throws \Exception
-     *
-     * @return mixed
      */
     public static function findScalar($input)
     {
@@ -122,7 +117,7 @@ final class Json
             return self::findScalar(self::parse($input));
         }
 
-        if (!is_scalar($input)) {
+        if (! is_scalar($input)) {
             throw new \Exception("Can't find a scalar in provided input");
         }
 
@@ -132,11 +127,7 @@ final class Json
     /**
      * Find an array in provided string/json/array.
      *
-     * @param $input
-     *
      * @throws \Exception
-     *
-     * @return mixed
      */
     public static function findArray($input)
     {
@@ -148,7 +139,7 @@ final class Json
             return self::findArray(self::parse($input));
         }
 
-        if (!is_iterable($input)) {
+        if (! is_iterable($input)) {
             throw new \Exception("Can't find an array in provided input");
         }
 
@@ -157,14 +148,10 @@ final class Json
 
     /**
      * Return whether the given string is JSON.
-     *
-     * @param mixed $json
-     *
-     * @return bool
      */
-    public static function test($json)
+    public static function test($json): bool
     {
-        if (!\is_string($json) && !\is_callable([$json, '__toString'])) {
+        if (! \is_string($json) && ! \is_callable([$json, '__toString'])) {
             return false;
         }
 
@@ -198,7 +185,7 @@ final class Json
      *
      * @see https://github.com/Seldaek/monolog/pull/683
      */
-    private static function detectAndCleanUtf8(&$data)
+    private static function detectAndCleanUtf8(&$data): void
     {
         if ($data instanceof \JsonSerializable) {
             $data = $data->jsonSerialize();
@@ -212,12 +199,14 @@ final class Json
 
             return;
         }
-        if (!\is_string($data) || preg_match('//u', $data)) {
+        if (! \is_string($data) || preg_match('//u', $data)) {
             return;
         }
         $data = preg_replace_callback(
             '/[\x80-\xFF]+/',
-            function ($m) { return utf8_encode($m[0]); },
+            function ($m) {
+                return utf8_encode($m[0]);
+            },
             $data
         );
         $data = str_replace(

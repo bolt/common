@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bolt\Common;
 
 class Str
@@ -11,17 +13,15 @@ class Str
      * @param string $search
      * @param string $replace
      * @param bool   $caseSensitive
-     *
-     * @return string
      */
-    public static function replaceFirst($subject, $search, $replace, $caseSensitive = true)
+    public static function replaceFirst($subject, $search, $replace, $caseSensitive = true): string
     {
-        $pos = $caseSensitive ? strpos($subject, $search) : stripos($subject, $search);
+        $pos = $caseSensitive ? mb_strpos($subject, $search) : mb_stripos($subject, $search);
         if ($pos === false) {
             return $subject;
         }
 
-        return substr_replace($subject, $replace, $pos, \strlen($search));
+        return substr_replace($subject, $replace, $pos, \mb_strlen($search));
     }
 
     /**
@@ -31,17 +31,15 @@ class Str
      * @param string $search
      * @param string $replace
      * @param bool   $caseSensitive
-     *
-     * @return string
      */
-    public static function replaceLast($subject, $search, $replace, $caseSensitive = true)
+    public static function replaceLast($subject, $search, $replace, $caseSensitive = true): string
     {
-        $pos = $caseSensitive ? strrpos($subject, $search) : strripos($subject, $search);
+        $pos = $caseSensitive ? mb_strrpos($subject, $search) : mb_strripos($subject, $search);
         if ($pos === false) {
             return $subject;
         }
 
-        return substr_replace($subject, $replace, $pos, \strlen($search));
+        return substr_replace($subject, $replace, $pos, \mb_strlen($search));
     }
 
     /**
@@ -50,10 +48,8 @@ class Str
      * @param string $subject
      * @param string $search
      * @param bool   $caseSensitive
-     *
-     * @return string
      */
-    public static function removeFirst($subject, $search, $caseSensitive = true)
+    public static function removeFirst($subject, $search, $caseSensitive = true): string
     {
         return static::replaceFirst($subject, $search, '', $caseSensitive);
     }
@@ -64,10 +60,8 @@ class Str
      * @param string $subject
      * @param string $search
      * @param bool   $caseSensitive
-     *
-     * @return string
      */
-    public static function removeLast($subject, $search, $caseSensitive = true)
+    public static function removeLast($subject, $search, $caseSensitive = true): string
     {
         return static::replaceLast($subject, $search, '', $caseSensitive);
     }
@@ -80,10 +74,8 @@ class Str
      * @param string $delimiter The term to split on
      *
      * @throws \InvalidArgumentException
-     *
-     * @return string
      */
-    public static function splitFirst($subject, $delimiter)
+    public static function splitFirst($subject, $delimiter): string
     {
         Assert::notEmpty($delimiter);
 
@@ -100,10 +92,8 @@ class Str
      * @param string $delimiter The term to split on
      *
      * @throws \InvalidArgumentException
-     *
-     * @return string
      */
-    public static function splitLast($subject, $delimiter)
+    public static function splitLast($subject, $delimiter): string
     {
         Assert::notEmpty($delimiter);
 
@@ -118,27 +108,23 @@ class Str
      * @param string $subject
      * @param string $search
      * @param bool   $caseSensitive
-     *
-     * @return bool
      */
-    public static function endsWith($subject, $search, $caseSensitive = true)
+    public static function endsWith($subject, $search, $caseSensitive = true): bool
     {
-        if (!$caseSensitive) {
-            $subject = strtolower($subject);
-            $search = strtolower($search);
+        if (! $caseSensitive) {
+            $subject = mb_strtolower($subject);
+            $search = mb_strtolower($search);
         }
 
-        return $search === '' || substr($subject, -\strlen($search)) === $search;
+        return $search === '' || mb_substr($subject, -\mb_strlen($search)) === $search;
     }
 
     /**
      * Returns the class name without the namespace.
      *
      * @param string|object $class object or fully qualified class name
-     *
-     * @return string
      */
-    public static function className($class)
+    public static function className($class): string
     {
         if (\is_object($class)) {
             $class = \get_class($class);
@@ -158,9 +144,9 @@ class Str
      *
      * @return string The humanized text
      */
-    public static function humanize($text)
+    public static function humanize($text): string
     {
-        return ucfirst(trim(strtolower(preg_replace(['/([A-Z])/', '/[_\s]+/'], ['_$1', ' '], $text))));
+        return ucfirst(trim(mb_strtolower(preg_replace(['/([A-Z])/', '/[_\s]+/'], ['_$1', ' '], $text))));
     }
 
     /**
@@ -171,9 +157,13 @@ class Str
      *
      * @return string The camel cased text
      */
-    public static function camelCase($text, $lowercaseFirstChar = false)
+    public static function camelCase($text, $lowercaseFirstChar = false): string
     {
-        $text = strtr(ucwords(strtr($text, ['_' => ' ', '.' => '_ ', '\\' => '_ '])), [' ' => '']);
+        $text = strtr(ucwords(strtr($text, [
+            '_' => ' ',
+            '.' => '_ ',
+            '\\' => '_ ',
+        ])), [' ' => '']);
         if ($lowercaseFirstChar) {
             $text = lcfirst($text);
         }
@@ -188,9 +178,9 @@ class Str
      *
      * @return string The snake cased text
      */
-    public static function snakeCase($text)
+    public static function snakeCase($text): string
     {
-        return strtolower(
+        return mb_strtolower(
             preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], ['\\1_\\2', '\\1_\\2'], $text)
         );
     }

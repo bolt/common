@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bolt\Common;
 
 /**
@@ -10,16 +12,14 @@ namespace Bolt\Common;
 class Ini
 {
     /** @var array [string key => bool editable] */
-    private static $keys;
+    private static $keys = [];
 
     /**
      * Checks whether the given key exists.
      *
      * @param string $key
-     *
-     * @return bool
      */
-    public static function has($key)
+    public static function has($key): bool
     {
         if (static::$keys === null) {
             static::readKeys();
@@ -33,10 +33,8 @@ class Ini
      *
      * @param string      $key
      * @param string|null $default
-     *
-     * @return string|null
      */
-    public static function getStr($key, $default = null)
+    public static function getStr($key, $default = null): ?string
     {
         $value = ini_get($key);
 
@@ -49,10 +47,8 @@ class Ini
      * If the key does not exist false is returned.
      *
      * @param string $key
-     *
-     * @return bool
      */
-    public static function getBool($key)
+    public static function getBool($key): bool
     {
         return filter_var(ini_get($key), FILTER_VALIDATE_BOOLEAN);
     }
@@ -81,10 +77,8 @@ class Ini
      *
      * @param string   $key
      * @param int|null $default
-     *
-     * @return int|null
      */
-    public static function getBytes($key, $default = null)
+    public static function getBytes($key, $default = null): ?int
     {
         $value = ini_get($key);
 
@@ -99,19 +93,18 @@ class Ini
         $unit = preg_replace('/[^bkmgtpezy]/i', '', $value);
         $size = preg_replace('/[^0-9\.]/', '', $value);
 
-        return ((int) $size) * ($unit ? pow(1024, stripos('bkmgtpezy', $unit[0])) : 1);
+        return ((int) $size) * ($unit ? pow(1024, mb_stripos('bkmgtpezy', $unit[0])) : 1);
     }
 
     /**
      * Set a new value for the given key.
      *
      * @param string $key
-     * @param mixed  $value
      *
      * @throws \InvalidArgumentException when the value is not scalar or null
      * @throws \RuntimeException         when the key does not exist, it is not editable, or some unknown reason
      */
-    public static function set($key, $value)
+    public static function set($key, $value): void
     {
         Assert::nullOrScalar($value, 'ini values must be scalar or null. Got: %s');
 
@@ -121,20 +114,20 @@ class Ini
         $ex = null;
         try {
             $result = Thrower::call('ini_set', $key, $iniValue);
-        } catch (\Exception $ex) {
+        } catch (\Throwable $ex) {
         }
 
         if ($result === false || $ex !== null) {
-            if (!static::has($key)) {
+            if (! static::has($key)) {
                 throw new \RuntimeException(
-                    "The ini option '$key' does not exist. New ini options cannot be added.",
+                    "The ini option '${key}' does not exist. New ini options cannot be added.",
                     0,
                     $ex
                 );
             }
-            if (!static::$keys[$key]) {
+            if (! static::$keys[$key]) {
                 throw new \RuntimeException(
-                    "Unable to change ini option '$key', because it is not editable at runtime.",
+                    "Unable to change ini option '${key}', because it is not editable at runtime.",
                     0,
                     $ex
                 );
@@ -154,7 +147,7 @@ class Ini
     /**
      * Process all ini options to get list of keys and determine which ones are editable.
      */
-    private static function readKeys()
+    private static function readKeys(): void
     {
         static::$keys = [];
 

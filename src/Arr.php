@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bolt\Common;
 
 use ArrayAccess;
@@ -23,11 +25,9 @@ class Arr
     /**
      * Converts an `iterable`, `null`, or `stdClass` to an array.
      *
-     * @param iterable|null|\stdClass $iterable
-     *
-     * @return array
+     * @param iterable|\stdClass|null $iterable
      */
-    public static function from($iterable)
+    public static function from($iterable): array
     {
         if (\is_array($iterable)) {
             return $iterable;
@@ -48,11 +48,9 @@ class Arr
     /**
      * Recursively converts an `iterable` to nested arrays.
      *
-     * @param iterable|null|\stdClass $iterable
-     *
-     * @return array
+     * @param iterable|\stdClass|null $iterable
      */
-    public static function fromRecursive($iterable)
+    public static function fromRecursive($iterable): array
     {
         $arr = static::from($iterable);
 
@@ -94,10 +92,8 @@ class Arr
      * @param iterable        $input     A list of arrays or objects from which to pull a column of values
      * @param string|int|null $columnKey The key of the values to return or `null` for no change
      * @param string|int|null $indexKey  The key of the keys to return or `null` for no change
-     *
-     * @return array
      */
-    public static function column($input, $columnKey, $indexKey = null)
+    public static function column($input, $columnKey, $indexKey = null): array
     {
         Assert::isIterable($input);
 
@@ -167,10 +163,8 @@ class Arr
      *
      * @param array|ArrayAccess $data Data to check values from
      * @param string            $path Path to traverse and check keys from
-     *
-     * @return bool
      */
-    public static function has($data, $path)
+    public static function has($data, $path): bool
     {
         Assert::isArrayAccessible($data);
         Assert::stringNotEmpty($path);
@@ -178,10 +172,10 @@ class Arr
         $path = explode('/', $path);
 
         while (($part = array_shift($path)) !== null) {
-            if (!($data instanceof ArrayAccess) && !\is_array($data)) {
+            if (! ($data instanceof ArrayAccess) && ! \is_array($data)) {
                 return false;
             }
-            if (!(isset($data[$part]) || array_key_exists($part, $data))) {
+            if (! (isset($data[$part]) || array_key_exists($part, $data))) {
                 return false;
             }
             $data = $data[$part];
@@ -218,7 +212,7 @@ class Arr
         $path = explode('/', $path);
 
         while (($part = array_shift($path)) !== null) {
-            if ((!\is_array($data) && !($data instanceof ArrayAccess)) || !isset($data[$part])) {
+            if ((! \is_array($data) && ! ($data instanceof ArrayAccess)) || ! isset($data[$part])) {
                 return $default;
             }
             $data = $data[$part];
@@ -261,7 +255,7 @@ class Arr
      *
      * @throws \ErrorException
      */
-    public static function set(&$data, $path, $value)
+    public static function set(&$data, $path, $value): void
     {
         Assert::isArrayAccessible($data);
         Assert::stringNotEmpty($path);
@@ -283,7 +277,7 @@ class Arr
         $invalidKey = null;
         $current = &$data;
         while (($key = array_shift($queue)) !== null) {
-            if (!\is_array($current) && !($current instanceof ArrayAccess)) {
+            if (! \is_array($current) && ! ($current instanceof ArrayAccess)) {
                 throw new RuntimeException(
                     sprintf(
                         "Cannot set '%s', because '%s' is already set and not an array or an object implementing ArrayAccess.",
@@ -292,7 +286,7 @@ class Arr
                     )
                 );
             }
-            if (!$queue) {
+            if (! $queue) {
                 if ($key === '[]') {
                     $current[] = $value;
                 } elseif (static::$unsetMarker && $value === static::$unsetMarker) {
@@ -304,12 +298,12 @@ class Arr
                 return;
             }
 
-            if (!isset($current[$key])) {
+            if (! isset($current[$key])) {
                 $current[$key] = [];
             }
 
             $next = null;
-            if ($current instanceof ArrayAccess && !static::canReturnArraysByReference($current, $key, $next, $e)) {
+            if ($current instanceof ArrayAccess && ! static::canReturnArraysByReference($current, $key, $next, $e)) {
                 throw new RuntimeException(
                     sprintf(
                         "Cannot set '%s', because '%s' is an %s which does not return arrays by reference from its offsetGet() method.",
@@ -356,12 +350,10 @@ class Arr
      * @param mixed|null        $default Default value to return if key does not exist
      *
      * @throws \ErrorException
-     *
-     * @return mixed
      */
     public static function remove(&$data, $path, $default = null)
     {
-        if (!static::$unsetMarker) {
+        if (! static::$unsetMarker) {
             static::$unsetMarker = new \stdClass();
         }
 
@@ -385,12 +377,8 @@ class Arr
 
     /**
      * Returns whether the value is an array or an object implementing `ArrayAccess`.
-     *
-     * @param mixed $value
-     *
-     * @return bool
      */
-    public static function isAccessible($value)
+    public static function isAccessible($value): bool
     {
         return $value instanceof ArrayAccess || \is_array($value);
     }
@@ -398,13 +386,11 @@ class Arr
     /**
      * Asserts that the given value is an array or an object implementing `ArrayAccess`.
      *
-     * @param mixed $value
-     *
      * @throws InvalidArgumentException when it is not
      *
      * @deprecated since 1.0 and will be removed in 2.0. Use {@see \Bolt\Common\Assert::isArrayAccessible} instead.
      */
-    public static function assertAccessible($value)
+    public static function assertAccessible($value): void
     {
         Deprecated::method(1.0, 'Bolt\Common\Assert::isArrayAccessible');
 
@@ -417,15 +403,13 @@ class Arr
      * Note: Empty arrays are not.
      *
      * @param iterable $iterable
-     *
-     * @return bool
      */
-    public static function isAssociative($iterable)
+    public static function isAssociative($iterable): bool
     {
         if ($iterable instanceof Traversable) {
             $iterable = iterator_to_array($iterable);
         }
-        if (!\is_array($iterable) || $iterable === []) {
+        if (! \is_array($iterable) || $iterable === []) {
             return false;
         }
 
@@ -438,16 +422,14 @@ class Arr
      * Note: Empty iterables are.
      *
      * @param iterable $iterable
-     *
-     * @return bool
      */
-    public static function isIndexed($iterable)
+    public static function isIndexed($iterable): bool
     {
-        if (!\is_iterable($iterable)) {
+        if (! \is_iterable($iterable)) {
             return false;
         }
 
-        return !static::isAssociative($iterable);
+        return ! static::isAssociative($iterable);
     }
 
     /**
@@ -459,10 +441,8 @@ class Arr
      * @param callable $callable Function is passed `($value, $key)`
      *
      * @throws \ReflectionException
-     *
-     * @return array
      */
-    public static function mapRecursive($iterable, callable $callable)
+    public static function mapRecursive($iterable, callable $callable): array
     {
         Assert::isIterable($iterable);
 
@@ -481,11 +461,8 @@ class Arr
      * Internal method do actual recursion after args have been validated by main method.
      *
      * @param iterable $iterable
-     * @param callable $callable
-     *
-     * @return array
      */
-    private static function doMapRecursive($iterable, callable $callable)
+    private static function doMapRecursive($iterable, callable $callable): array
     {
         $mapped = [];
         foreach ($iterable as $key => $value) {
@@ -514,7 +491,7 @@ class Arr
      *
      * @return array The combined array
      */
-    public static function replaceRecursive($iterable1, $iterable2)
+    public static function replaceRecursive($iterable1, $iterable2): array
     {
         Assert::allIsIterable([$iterable1, $iterable2]);
 
@@ -552,22 +529,19 @@ class Arr
     /**
      * Determine whether the ArrayAccess object can return by reference.
      *
-     * @param ArrayAccess      $obj
      * @param string           $key   The key to try with
      * @param ArrayAccess|null $value The value if it needed to be fetched
      * @param \ErrorException  $ex
      *
      * @throws \ErrorException
      * @throws \ReflectionException
-     *
-     * @return bool
      */
-    private static function canReturnArraysByReference(ArrayAccess $obj, $key, &$value, &$ex)
+    private static function canReturnArraysByReference(ArrayAccess $obj, $key, &$value, &$ex): bool
     {
         static $supportedClasses = [
             // These fail reflection check below even though they work fine :rolleyes:
-            \ArrayObject::class            => true,
-            \ArrayIterator::class          => true,
+            \ArrayObject::class => true,
+            \ArrayIterator::class => true,
             \RecursiveArrayIterator::class => true,
         ];
         static $noErrors = [];
@@ -582,7 +556,7 @@ class Arr
          * null instead of true. This allows the reflection check to only happen once, but still drop through to
          * validation below.
          */
-        if (!isset($supportedClasses[$class])) {
+        if (! isset($supportedClasses[$class])) {
             $supportedClasses[$class] = (new \ReflectionMethod($obj, 'offsetGet'))->returnsReference() ? null : false;
         }
 
@@ -600,7 +574,7 @@ class Arr
             } catch (\ErrorException $e) {
                 $msg = $e->getMessage();
                 if ($msg === 'Only variable references should be returned by reference' ||
-                    strpos($msg, 'Indirect modification of overloaded element') === 0
+                    mb_strpos($msg, 'Indirect modification of overloaded element') === 0
                 ) {
                     $ex = $e;
 
@@ -616,7 +590,7 @@ class Arr
         }
 
         // We cannot validate this result because objects are always returned by reference (and scalars do not matter).
-        if (!\is_array($value1)) {
+        if (! \is_array($value1)) {
             // return value (via parameter) so set() doesn't have to fetch the item again.
             // We cannot do this if is an array because it will be the value instead of the reference.
             $value = $value1;
@@ -649,10 +623,8 @@ class Arr
      *
      * @param iterable $iterable The iterable to flatten
      * @param int      $depth    How deep to flatten
-     *
-     * @return array
      */
-    public static function flatten($iterable, $depth = 1)
+    public static function flatten($iterable, $depth = 1): array
     {
         Assert::isIterable($iterable);
 
@@ -669,11 +641,8 @@ class Arr
      * @param iterable $iterable  The iterable to flatten
      * @param int      $depth     How deep to flatten
      * @param callable $predicate Whether to recurse the item
-     * @param array    $result    The result array
-     *
-     * @return array
      */
-    private static function doFlatten($iterable, $depth, callable $predicate, array $result = [])
+    private static function doFlatten($iterable, $depth, callable $predicate, array $result = []): array
     {
         foreach ($iterable as $item) {
             if ($depth >= 1 && $predicate($item)) {
