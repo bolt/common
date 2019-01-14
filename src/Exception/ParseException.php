@@ -78,8 +78,6 @@ class ParseException extends \RuntimeException
      * Sets the message.
      *
      * Don't include line number and snippet in this as they will be merged separately.
-     *
-     * @param string $rawMessage
      */
     public function setRawMessage(string $rawMessage): void
     {
