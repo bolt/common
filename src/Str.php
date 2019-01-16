@@ -16,7 +16,7 @@ class Str
             return $subject;
         }
 
-        return substr_replace($subject, $replace, $pos, \mb_strlen($search));
+        return substr_replace($subject, $replace, $pos, mb_strlen($search));
     }
 
     /**
@@ -29,7 +29,7 @@ class Str
             return $subject;
         }
 
-        return substr_replace($subject, $replace, $pos, \mb_strlen($search));
+        return substr_replace($subject, $replace, $pos, mb_strlen($search));
     }
 
     /**
@@ -94,7 +94,7 @@ class Str
             $search = mb_strtolower($search);
         }
 
-        return $search === '' || mb_substr($subject, -\mb_strlen($search)) === $search;
+        return $search === '' || mb_substr($subject, -mb_strlen($search)) === $search;
     }
 
     /**
@@ -104,8 +104,8 @@ class Str
      */
     public static function className($class): string
     {
-        if (\is_object($class)) {
-            $class = \get_class($class);
+        if (is_object($class)) {
+            $class = get_class($class);
         }
 
         return static::splitLast($class, '\\');
