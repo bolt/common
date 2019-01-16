@@ -35,7 +35,7 @@ class Deprecated
     public static function method($since = null, $suggest = '', $subject = 0): void
     {
         if ($subject === null || is_int($subject)) {
-            [0 => $subject, 1 => $function, 3 => $constructor] = static::getCaller($subject ?: 0);
+            [$subject, $function, $constructor] = static::getCaller($subject ?: 0);
         } else {
             Assert::stringNotEmpty($subject, 'Expected a non-empty string. Got: %s');
             $function = $subject;
@@ -111,7 +111,6 @@ class Deprecated
         return [
             $class . (! $constructor ? '::' . $function : ''),
             $function,
-            $class,
             $constructor,
         ];
     }
