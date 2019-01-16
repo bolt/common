@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bolt\Common;
 
 use Bolt\Common\Exception\DumpException;
@@ -15,18 +17,13 @@ class Serialization
     /**
      * Dump (Serialize) value.
      *
-     * @param mixed $value
-     *
      * @throws DumpException when serializing fails
-     *
-     * @return string
      */
-    public static function dump($value)
+    public static function dump($value): string
     {
         try {
             return serialize($value);
-        } catch (\Error $e) {
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
         }
 
         throw new DumpException(sprintf('Error serializing value. %s', $e->getMessage()), 0, $e);
@@ -39,12 +36,10 @@ class Serialization
      * @param array  $options
      *
      * @throws ParseException when unserializing fails
-     *
-     * @return mixed
      */
     public static function parse($value, $options = [])
     {
-        $unserializeHandler = ini_set('unserialize_callback_func', __CLASS__ . '::handleUnserializeCallback');
+        $unserializeHandler = ini_set('unserialize_callback_func', self::class . '::handleUnserializeCallback');
         try {
             if (\PHP_VERSION_ID < 70000) {
                 return Thrower::call('unserialize', $value);
@@ -53,8 +48,7 @@ class Serialization
             return Thrower::call('unserialize', $value, $options);
         } catch (ParseException $e) {
             throw $e;
-        } catch (\Error $e) {
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
         } finally {
             ini_set('unserialize_callback_func', $unserializeHandler);
         }
@@ -67,7 +61,7 @@ class Serialization
      *
      * @param string $class
      */
-    public static function handleUnserializeCallback($class)
+    public static function handleUnserializeCallback($class): void
     {
         throw new ParseException(sprintf('Error parsing serialized value. Could not find class: %s', $class));
     }

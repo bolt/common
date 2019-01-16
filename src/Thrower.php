@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bolt\Common;
 
 /**
@@ -17,18 +19,13 @@ class Thrower
     /**
      * Call the given callable with given args, but throws an ErrorException when an error/warning/notice is triggered.
      *
-     * @param callable $callable
-     * @param array    ...$args
-     *
      * @throws \ErrorException when an error/warning/notice is triggered
-     *
-     * @return mixed
      */
     public static function call(callable $callable)
     {
         static::set();
         try {
-            return \call_user_func_array($callable, \array_slice(\func_get_args(), 1));
+            return call_user_func_array($callable, array_slice(func_get_args(), 1));
         } finally {
             restore_error_handler();
         }
@@ -41,10 +38,10 @@ class Thrower
      *
      * @return callable|null the previous handler
      */
-    public static function set()
+    public static function set(): ?callable
     {
-        if (!static::$handler) {
-            static::$handler = function ($severity, $message, $file, $line) {
+        if (! static::$handler) {
+            static::$handler = function ($severity, $message, $file, $line): void {
                 throw new \ErrorException($message, 0, $severity, $file, $line);
             };
         }

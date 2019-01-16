@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bolt\Common;
 
 /**
@@ -30,10 +32,10 @@ class Deprecated
      *                            that will be the suggestion
      * @param string|int $subject The method or class name or the index of the call stack to reference
      */
-    public static function method($since = null, $suggest = '', $subject = 0)
+    public static function method($since = null, $suggest = '', $subject = 0): void
     {
-        if ($subject === null || \is_int($subject)) {
-            list($subject, $function, $class, $constructor) = static::getCaller($subject ?: 0);
+        if ($subject === null || is_int($subject)) {
+            [$subject, $function, $constructor] = static::getCaller($subject ?: 0);
         } else {
             Assert::stringNotEmpty($subject, 'Expected a non-empty string. Got: %s');
             $function = $subject;
@@ -43,16 +45,16 @@ class Deprecated
         // Shortcut for suggested method
         if ($suggest && preg_match('/\s/', $suggest) === 0) {
             // Append () if it is a method/function (not a class)
-            if (!class_exists($suggest)) {
+            if (! class_exists($suggest)) {
                 $suggest .= '()';
-            } elseif (!$constructor && method_exists($suggest, $function)) {
+            } elseif (! $constructor && method_exists($suggest, $function)) {
                 // $suggest is class that has matching method name and is not the constructor
-                $suggest = $suggest . '::' . $function . '()';
+                $suggest .= '::' . $function . '()';
             }
-            $suggest = "Use $suggest instead.";
+            $suggest = "Use ${suggest} instead.";
         }
 
-        if (!$constructor) {
+        if (! $constructor) {
             $subject .= '()';
         }
 
@@ -67,22 +69,22 @@ class Deprecated
      *
      * @return array [string repr, function name, class name or false, isConstructor]
      */
-    protected static function getCaller($index, $offset = 1)
+    protected static function getCaller($index, $offset = 1): array
     {
         Assert::greaterThanEq($index, 0);
 
         $index += $offset + 1;
 
         $stack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $index + 1);
-        if (!isset($stack[$index])) {
+        if (! isset($stack[$index])) {
             throw new \OutOfBoundsException(sprintf('%s is greater than the current call stack', $index - $offset - 1));
         }
         $frame = $stack[$index];
 
-        if (!isset($frame['class'])) {
+        if (! isset($frame['class'])) {
             // Assert the function isn't called directly from a script,
             // else we would be saying "require() is deprecated" lol.
-            if (!\function_exists($frame['function'])) {
+            if (! function_exists($frame['function'])) {
                 $frame = $stack[$index - $offset];
                 throw new \InvalidArgumentException(
                     sprintf('%s::%s() must be called from within a function/method.', $frame['class'], $frame['function'])
@@ -102,14 +104,13 @@ class Deprecated
         $constructor = $function === '__construct';
 
         if ($function === '__call' || $function === '__callStatic') {
-            $frame = debug_backtrace(false, $index + 1)[$index]; // with args
+            $frame = debug_backtrace(0, $index + 1)[$index]; // with args
             $function = $frame['args'][0];
         }
 
         return [
-            $class . (!$constructor ? '::' . $function : ''),
+            $class . (! $constructor ? '::' . $function : ''),
             $function,
-            $class,
             $constructor,
         ];
     }
@@ -121,11 +122,11 @@ class Deprecated
      * @param float|null $since   The version it was deprecated in
      * @param string     $suggest A class or suggestion of what to use instead
      */
-    public static function cls($class, $since = null, $suggest = null)
+    public static function cls($class, $since = null, $suggest = null): void
     {
         if ($suggest && preg_match('/\s/', $suggest) === 0) {
             $suggest = ltrim($suggest, '\\');
-            $suggest = "Use $suggest instead.";
+            $suggest = "Use ${suggest} instead.";
         }
         $class = ltrim($class, '\\');
 
@@ -149,7 +150,7 @@ class Deprecated
      * @param float|null $since   The version it was deprecated in
      * @param string     $suggest A suggestion of what to do instead
      */
-    public static function warn($subject, $since = null, $suggest = '')
+    public static function warn($subject, $since = null, $suggest = ''): void
     {
         $message = $subject . ' is deprecated';
 
@@ -172,7 +173,7 @@ class Deprecated
      *
      * @param string $message The raw message
      */
-    public static function raw($message)
+    public static function raw($message): void
     {
         @trigger_error($message, E_USER_DEPRECATED);
     }
