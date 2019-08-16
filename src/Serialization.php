@@ -23,7 +23,6 @@ class Serialization
     {
         try {
             return serialize($value);
-        } catch (\Error $e) {
         } catch (\Throwable $e) {
         }
 
@@ -49,7 +48,6 @@ class Serialization
             return Thrower::call('unserialize', $value, $options);
         } catch (ParseException $e) {
             throw $e;
-        } catch (\Error $e) {
         } catch (\Throwable $e) {
         } finally {
             ini_set('unserialize_callback_func', $unserializeHandler);

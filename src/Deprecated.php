@@ -34,8 +34,8 @@ class Deprecated
      */
     public static function method($since = null, $suggest = '', $subject = 0): void
     {
-        if ($subject === null || \is_int($subject)) {
-            [0 => $subject, 1 => $function, 3 => $constructor] = static::getCaller($subject ?: 0);
+        if ($subject === null || is_int($subject)) {
+            [$subject, $function, $constructor] = static::getCaller($subject ?: 0);
         } else {
             Assert::stringNotEmpty($subject, 'Expected a non-empty string. Got: %s');
             $function = $subject;
@@ -84,7 +84,7 @@ class Deprecated
         if (! isset($frame['class'])) {
             // Assert the function isn't called directly from a script,
             // else we would be saying "require() is deprecated" lol.
-            if (! \function_exists($frame['function'])) {
+            if (! function_exists($frame['function'])) {
                 $frame = $stack[$index - $offset];
                 throw new \InvalidArgumentException(
                     sprintf('%s::%s() must be called from within a function/method.', $frame['class'], $frame['function'])
@@ -104,14 +104,13 @@ class Deprecated
         $constructor = $function === '__construct';
 
         if ($function === '__call' || $function === '__callStatic') {
-            $frame = debug_backtrace(false, $index + 1)[$index]; // with args
+            $frame = debug_backtrace(0, $index + 1)[$index]; // with args
             $function = $frame['args'][0];
         }
 
         return [
             $class . (! $constructor ? '::' . $function : ''),
             $function,
-            $class,
             $constructor,
         ];
     }

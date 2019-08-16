@@ -16,12 +16,10 @@ class Ini
 
     /**
      * Checks whether the given key exists.
-     *
-     * @param string $key
      */
-    public static function has($key): bool
+    public static function has(string $key): bool
     {
-        if (static::$keys === null) {
+        if (static::$keys === []) {
             static::readKeys();
         }
 
@@ -30,11 +28,8 @@ class Ini
 
     /**
      * Returns the string value of the given key or the given default if it is empty or does not exist.
-     *
-     * @param string      $key
-     * @param string|null $default
      */
-    public static function getStr($key, $default = null): ?string
+    public static function getStr(string $key, ?string $default = null): ?string
     {
         $value = ini_get($key);
 
@@ -45,10 +40,8 @@ class Ini
      * Returns the value of the given key filtered to a boolean.
      *
      * If the key does not exist false is returned.
-     *
-     * @param string $key
      */
-    public static function getBool($key): bool
+    public static function getBool(string $key): bool
     {
         return filter_var(ini_get($key), FILTER_VALIDATE_BOOLEAN);
     }

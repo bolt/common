@@ -29,7 +29,7 @@ class Arr
      */
     public static function from($iterable): array
     {
-        if (\is_array($iterable)) {
+        if (is_array($iterable)) {
             return $iterable;
         }
         if ($iterable instanceof Traversable) {
@@ -55,7 +55,7 @@ class Arr
         $arr = static::from($iterable);
 
         foreach ($arr as $key => $value) {
-            if ($value instanceof \stdClass || \is_iterable($value)) {
+            if ($value instanceof \stdClass || is_iterable($value)) {
                 $value = static::fromRecursive($value);
             }
             $arr[$key] = $value;
@@ -105,11 +105,11 @@ class Arr
 
             if ($columnKey === null) {
                 $value = $row;
-            } elseif (\is_array($row) && array_key_exists($columnKey, $row)) {
+            } elseif (is_array($row) && array_key_exists($columnKey, $row)) {
                 $value = $row[$columnKey];
             } elseif ($row instanceof ArrayAccess && isset($row[$columnKey])) {
                 $value = $row[$columnKey];
-            } elseif (\is_object($row) && isset($row->{$columnKey})) {
+            } elseif (is_object($row) && isset($row->{$columnKey})) {
                 $value = $row->{$columnKey};
             } else {
                 continue;
@@ -121,13 +121,13 @@ class Arr
                  * For ArrayAccess we assume devs are smarter and don't have this edge case. Regardless, we don't have
                  * another way to check so it's up to them.
                  */
-                if (\is_array($row) && array_key_exists($indexKey, $row)) {
+                if (is_array($row) && array_key_exists($indexKey, $row)) {
                     $keySet = true;
                     $key = (string) $row[$indexKey];
                 } elseif ($row instanceof ArrayAccess && isset($row[$indexKey])) {
                     $keySet = true;
                     $key = (string) $row[$indexKey];
-                } elseif (\is_object($row) && isset($row->{$indexKey})) {
+                } elseif (is_object($row) && isset($row->{$indexKey})) {
                     $keySet = true;
                     $key = (string) $row->{$indexKey};
                 }
@@ -164,7 +164,7 @@ class Arr
      * @param array|ArrayAccess $data Data to check values from
      * @param string            $path Path to traverse and check keys from
      */
-    public static function has($data, $path): bool
+    public static function has($data, string $path): bool
     {
         Assert::isArrayAccessible($data);
         Assert::stringNotEmpty($path);
@@ -172,7 +172,7 @@ class Arr
         $path = explode('/', $path);
 
         while (($part = array_shift($path)) !== null) {
-            if (! ($data instanceof ArrayAccess) && ! \is_array($data)) {
+            if (! ($data instanceof ArrayAccess) && ! is_array($data)) {
                 return false;
             }
             if (! (isset($data[$part]) || array_key_exists($part, $data))) {
@@ -204,7 +204,7 @@ class Arr
      *
      * @return mixed|null
      */
-    public static function get($data, $path, $default = null)
+    public static function get($data, string $path, $default = null)
     {
         Assert::isArrayAccessible($data);
         Assert::stringNotEmpty($path);
@@ -212,7 +212,7 @@ class Arr
         $path = explode('/', $path);
 
         while (($part = array_shift($path)) !== null) {
-            if ((! \is_array($data) && ! ($data instanceof ArrayAccess)) || ! isset($data[$part])) {
+            if ((! is_array($data) && ! ($data instanceof ArrayAccess)) || ! isset($data[$part])) {
                 return $default;
             }
             $data = $data[$part];
@@ -255,7 +255,7 @@ class Arr
      *
      * @throws \ErrorException
      */
-    public static function set(&$data, $path, $value): void
+    public static function set(&$data, string $path, $value): void
     {
         Assert::isArrayAccessible($data);
         Assert::stringNotEmpty($path);
@@ -277,7 +277,7 @@ class Arr
         $invalidKey = null;
         $current = &$data;
         while (($key = array_shift($queue)) !== null) {
-            if (! \is_array($current) && ! ($current instanceof ArrayAccess)) {
+            if (! is_array($current) && ! ($current instanceof ArrayAccess)) {
                 throw new RuntimeException(
                     sprintf(
                         "Cannot set '%s', because '%s' is already set and not an array or an object implementing ArrayAccess.",
@@ -351,7 +351,7 @@ class Arr
      *
      * @throws \ErrorException
      */
-    public static function remove(&$data, $path, $default = null)
+    public static function remove(&$data, string $path, $default = null)
     {
         if (! static::$unsetMarker) {
             static::$unsetMarker = new \stdClass();
@@ -380,7 +380,7 @@ class Arr
      */
     public static function isAccessible($value): bool
     {
-        return $value instanceof ArrayAccess || \is_array($value);
+        return $value instanceof ArrayAccess || is_array($value);
     }
 
     /**
@@ -409,7 +409,7 @@ class Arr
         if ($iterable instanceof Traversable) {
             $iterable = iterator_to_array($iterable);
         }
-        if (! \is_array($iterable) || $iterable === []) {
+        if (! is_array($iterable) || $iterable === []) {
             return false;
         }
 
@@ -425,7 +425,7 @@ class Arr
      */
     public static function isIndexed($iterable): bool
     {
-        if (! \is_iterable($iterable)) {
+        if (! is_iterable($iterable)) {
             return false;
         }
 
@@ -466,7 +466,7 @@ class Arr
     {
         $mapped = [];
         foreach ($iterable as $key => $value) {
-            $mapped[$key] = \is_iterable($value) ?
+            $mapped[$key] = is_iterable($value) ?
                 static::doMapRecursive($value, $callable) :
                 $callable($value, $key);
         }
@@ -508,11 +508,11 @@ class Arr
             if ($value instanceof Traversable) {
                 $value = iterator_to_array($value);
             }
-            if (\is_array($value) && static::isAssociative($value)
-                && isset($merged[$key]) && \is_iterable($merged[$key])
+            if (is_array($value) && static::isAssociative($value)
+                && isset($merged[$key]) && is_iterable($merged[$key])
             ) {
                 $merged[$key] = static::replaceRecursive($merged[$key], $value);
-            } elseif ($value === null && isset($merged[$key]) && \is_iterable($merged[$key])) {
+            } elseif ($value === null && isset($merged[$key]) && is_iterable($merged[$key])) {
                 // Convert iterable to array to be consistent.
                 if ($merged[$key] instanceof Traversable) {
                     $merged[$key] = iterator_to_array($merged[$key]);
@@ -590,7 +590,7 @@ class Arr
         }
 
         // We cannot validate this result because objects are always returned by reference (and scalars do not matter).
-        if (! \is_array($value1)) {
+        if (! is_array($value1)) {
             // return value (via parameter) so set() doesn't have to fetch the item again.
             // We cannot do this if is an array because it will be the value instead of the reference.
             $value = $value1;
