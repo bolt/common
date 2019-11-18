@@ -202,6 +202,8 @@ final class Json
             return false;
         }
 
+        $json = (string) $json;
+
         // Check if string has `[` or `{`, because otherwise `123` would pass.
         // That's strictly speaking valid JSON, but not what we're looking for.
         if (mb_strpos($json, '[') === false && mb_strpos($json, '{') === false) {
