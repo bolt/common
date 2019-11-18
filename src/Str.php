@@ -28,7 +28,7 @@ class Str
             return $subject;
         }
 
-        return substr_replace($subject, $replace, $pos, mb_strlen($search));
+        return self::mb_substr_replace($subject, $replace, $pos, mb_strlen($search));
     }
 
     /**
@@ -41,7 +41,7 @@ class Str
             return $subject;
         }
 
-        return substr_replace($subject, $replace, $pos, mb_strlen($search));
+        return self::mb_substr_replace($subject, $replace, $pos, mb_strlen($search));
     }
 
     /**
@@ -268,5 +268,54 @@ class Str
         }
 
         return $str;
+    }
+
+    /**
+     * @see https://gist.github.com/stemar/8287074
+     */
+    public static function mb_substr_replace($string, $replacement, $start, $length = null)
+    {
+        if (is_array($string)) {
+            $num = count($string);
+
+            // $replacement
+            $replacement = is_array($replacement) ? array_slice($replacement, 0, $num) : array_pad([$replacement], $num, $replacement);
+
+            // $start
+            if (is_array($start)) {
+                $start = array_slice($start, 0, $num);
+                foreach ($start as $key => $value) {
+                    $start[$key] = is_int($value) ? $value : 0;
+                }
+            } else {
+                $start = array_pad([$start], $num, $start);
+            }
+
+            // $length
+            if (! isset($length)) {
+                $length = array_fill(0, $num, 0);
+            } elseif (is_array($length)) {
+                $length = array_slice($length, 0, $num);
+                foreach ($length as $key => $value) {
+                    $length[$key] = isset($value) ? (is_int($value) ? $value : $num) : 0;
+                }
+            } else {
+                $length = array_pad([$length], $num, $length);
+            }
+
+            // Recursive call
+            return array_map(__FUNCTION__, $string, $replacement, $start, $length);
+        }
+
+        preg_match_all('/./us', (string) $string, $smatches);
+        preg_match_all('/./us', (string) $replacement, $rmatches);
+
+        if ($length === null) {
+            $length = mb_strlen($string);
+        }
+
+        array_splice($smatches[0], $start, $length, $rmatches[0]);
+
+        return implode($smatches[0]);
     }
 }
