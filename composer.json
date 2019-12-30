@@ -14,13 +14,13 @@
     ],
     "require": {
         "php": "^7.1",
-        "seld/jsonlint": "^1.4",
-        "webmozart/assert": "^1.2"
+        "seld/jsonlint": "^1.7",
+        "webmozart/assert": "^1.6"
     },
     "require-dev": {
-        "phpunit/phpunit": "^6.4",
-        "symfony/phpunit-bridge": "^3.3",
-        "symplify/easy-coding-standard": "^5.2"
+        "phpunit/phpunit": "^6.5",
+        "symfony/phpunit-bridge": "^3.4",
+        "symplify/easy-coding-standard": "^7.0.2"
     },
     "extra": {
         "branch-alias": {

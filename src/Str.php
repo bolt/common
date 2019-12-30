@@ -110,6 +110,45 @@ class Str
     }
 
     /**
+     * Returns whether the subjects starts with the search string.
+     */
+    public static function startsWith(string $subject, string $search, bool $caseSensitive = true): bool
+    {
+        if (! $caseSensitive) {
+            $subject = mb_strtolower($subject);
+            $search = mb_strtolower($search);
+        }
+
+        return $search === '' || mb_substr($subject, 0, mb_strlen($search)) === $search;
+    }
+
+    /**
+     * Ensure a string ends with a given string. If it doesn't already end in
+     * it, this function will append it.
+     */
+    public static function ensureEndsWith(string $subject, string $desiredEnd): string
+    {
+        if (! self::endsWith($subject, $desiredEnd)) {
+            $subject .= $desiredEnd;
+        }
+
+        return $subject;
+    }
+
+    /**
+     * Ensure a string starts with a given string. If it doesn't already start
+     * with it, this function will prepend it.
+     */
+    public static function ensureStartsWith(string $subject, string $desiredStart): string
+    {
+        if (! self::startsWith($subject, $desiredStart)) {
+            $subject = $desiredStart . $subject;
+        }
+
+        return $subject;
+    }
+
+    /**
      * Returns the class name without the namespace.
      *
      * @param string|object $class object or fully qualified class name
