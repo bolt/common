@@ -170,8 +170,9 @@ class Arr
         Assert::stringNotEmpty($path);
 
         $path = explode('/', $path);
+        $part = array_shift($path);
 
-        while (($part = array_shift($path)) !== null) {
+        while ($part !== null) {
             if (! ($data instanceof ArrayAccess) && ! is_array($data)) {
                 return false;
             }
@@ -179,6 +180,8 @@ class Arr
                 return false;
             }
             $data = $data[$part];
+
+            $part = array_shift($path);
         }
 
         return true;
@@ -210,12 +213,15 @@ class Arr
         Assert::stringNotEmpty($path);
 
         $path = explode('/', $path);
+        $part = array_shift($path);
 
-        while (($part = array_shift($path)) !== null) {
+        while ($part !== null) {
             if ((! is_array($data) && ! ($data instanceof ArrayAccess)) || ! isset($data[$part])) {
                 return $default;
             }
             $data = $data[$part];
+
+            $part = array_shift($path);
         }
 
         return $data;
@@ -276,7 +282,9 @@ class Arr
 
         $invalidKey = null;
         $current = &$data;
-        while (($key = array_shift($queue)) !== null) {
+        $key = array_shift($queue);
+
+        while ($key !== null) {
             if (! is_array($current) && ! ($current instanceof ArrayAccess)) {
                 throw new RuntimeException(
                     sprintf(
@@ -326,6 +334,8 @@ class Arr
             }
 
             $invalidKey = $key;
+
+            $key = array_shift($queue);
         }
     }
 

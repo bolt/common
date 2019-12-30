@@ -91,6 +91,31 @@ class StrTest extends TestCase
         $this->assertFalse(Str::endsWith('FooBar', 'Foo'));
     }
 
+    public function testStartsWith()
+    {
+        $this->assertTrue(Str::startsWith('FooBar', 'Foo'));
+        $this->assertTrue(Str::startsWith('FooBar', 'foo', false));
+        $this->assertFalse(Str::startsWith('FooBar', 'Qux'));
+    }
+
+    public function testEnsureEndsWith()
+    {
+        $this->assertsame('FooBar_', Str::ensureEndsWith('FooBar_', '_'));
+        $this->assertsame('FooBar_', Str::ensureEndsWith('FooBar', '_'));
+        $this->assertSame('FooBar__', Str::ensureEndsWith('FooBar__', '__'));
+        $this->assertSame('FooBar___', Str::ensureEndsWith('FooBar', '___'));
+        $this->assertsame('FooBar', Str::ensureEndsWith('FooBar', 'FooBar'));
+    }
+
+    public function testEnsureStartsWith()
+    {
+        $this->assertsame('_FooBar', Str::ensureStartsWith('FooBar', '_'));
+        $this->assertsame('_FooBar', Str::ensureStartsWith('_FooBar', '_'));
+        $this->assertSame('__FooBar', Str::ensureStartsWith('__FooBar', '__'));
+        $this->assertSame('___FooBar', Str::ensureStartsWith('FooBar', '___'));
+        $this->assertsame('FooBar', Str::ensureStartsWith('FooBar', 'FooBar'));
+    }
+
     public function testClassName()
     {
         $this->assertSame('StrTest', Str::className($this));
