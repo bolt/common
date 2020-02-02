@@ -220,7 +220,7 @@ class Str
      */
     public static function makeSafe(string $str, bool $strict = false, string $extrachars = ''): string
     {
-        $str = str_replace('&amp;', '', $str);
+        $str = str_replace('&amp;', '&', $str);
 
         $slugify = self::getSafeSlugify($strict, $extrachars);
         $str = $slugify->slugify($str, '');
