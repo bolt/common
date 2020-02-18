@@ -144,4 +144,27 @@ class StrTest extends TestCase
         $this->assertSame('foo_bar', Str::snakeCase('FooBar'));
         $this->assertSame('foo_bar', Str::snakeCase('foo_bar'));
     }
+
+    public function testMbStrReplace()
+    {
+        $this->assertSame('fooXXX', Str::mb_substr_replace('fooBarQuxBzzzz', 'XXX', 3));
+        $this->assertSame('fooXXXrQuxBzzzz', Str::mb_substr_replace('fooBarQuxBzzzz', 'XXX', 3, 2));
+        $this->assertSame('fooXXXz', Str::mb_substr_replace('fooBarQuxBzzzz', 'XXX', 3, 10));
+        $this->assertSame('XXX', Str::mb_substr_replace('fooBarQuxBzzzz', 'XXX', 0));
+        $this->assertSame('foXXXXX', Str::mb_substr_replace('foo', 'XXXXX', 2));
+        $this->assertSame('fooXXXr😎Qux🧙‍♂️Bzzzz', Str::mb_substr_replace('fooBar😎Qux🧙‍♂️Bzzzz', 'XXX', 3, 2));
+        $this->assertSame('foo💁‍♂️z', Str::mb_substr_replace('fooBarQuxBzzzz', '💁‍♂️', 3, 10));
+    }
+
+    public function testPlaceholder()
+    {
+        $this->assertSame(
+            'You are the apple to my eye.',
+            Str::placeholders('You are the {FOO} to my {BAR}.', ['foo' => 'apple', 'bar' => 'eye'])
+        );
+        $this->assertSame(
+            'You are the 🍏 to my 👁.',
+            Str::placeholders('You are the {FOO} to my {BAR}.', ['foo' => '🍏', 'bar' => '👁'])
+        );
+    }
 }
