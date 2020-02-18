@@ -292,7 +292,7 @@ class Str
     public static function generatePassword($length = 12)
     {
         // The "pool" of potential characters contains special characters, but
-        // with less frequency than 'a-z' and '0-9'.
+        // with lower frequency than 'a-z' and '0-9'.
         $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789' .
             'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789' .
             'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789' .
@@ -356,5 +356,17 @@ class Str
         array_splice($smatches[0], $start, $length, $rmatches[0]);
 
         return implode($smatches[0]);
+    }
+
+    public static function placeholders(string $string, array $replacements): string
+    {
+        return preg_replace_callback(
+            '/{([A-Z0-9_]+)}/',
+            function ($matches) use ($replacements) {
+                $key = mb_strtolower($matches[1]);
+                return array_key_exists($key, $replacements) ? $replacements[$key] : $matches[0];
+            },
+            $string
+        );
     }
 }
