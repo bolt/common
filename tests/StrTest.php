@@ -167,4 +167,25 @@ class StrTest extends TestCase
             Str::placeholders('You are the {FOO} to my {BAR}.', ['foo' => '🍏', 'bar' => '👁'])
         );
     }
+
+    public function testTitleCase()
+    {
+        $this->assertSame(
+            'You Are the Apple to My Eye.',
+            Str::titleCase('You are the apple to my eye.')
+        );
+        $this->assertSame(
+            'With -- Some Extra-Spacing!',
+            Str::titleCase(' with -- some extra-spacing! ')
+        );
+        $this->assertSame(
+            'Het Werkt Ook in het Nederlands',
+            Str::titleCase('het werkt ook in het Nederlands', ['de', 'het', 'een', 'en', 'op', 'te', '\'t', 'van', 'den'])
+        );
+        $this->assertSame(
+            'A Test for a Small Word at Start of Line',
+            Str::titleCase('a test for a small word at start of line')
+        );
+
+    }
 }

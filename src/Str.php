@@ -369,4 +369,186 @@ class Str
             $string
         );
     }
+
+    /**
+     * Returns a trimmed string in proper title case.
+     *
+     * Also accepts an array, $ignore, allowing you to list words not to be
+     * capitalized.
+     *
+     * Adapted from John Gruber's script, as used int `voku/portable-utf8`
+     *
+     * @see https://gist.github.com/gruber/9f9e8650d68b13ce4d78
+     * @see https://github.com/voku/portable-utf8/
+     *
+     * @param array  $ignore   <p>An array of words not to capitalize.</p>
+     * @param string $encoding [optional] <p>Set the charset for e.g. "mb_" function</p>
+     *
+     * @return string
+     *                <p>The titleized string.</p>
+     */
+    public static function titleCase(
+        string $str,
+        array $ignore = [],
+        string $encoding = 'UTF-8'
+    ): string {
+        if ($str === '') {
+            return '';
+        }
+
+        $small_words = [
+            '(?<!q&)a',
+            'an',
+            'and',
+            'as',
+            'at(?!&t)',
+            'but',
+            'by',
+            'en',
+            'for',
+            'if',
+            'in',
+            'of',
+            'on',
+            'or',
+            'the',
+            'to',
+            'v[.]?',
+            'via',
+            'vs[.]?',
+        ];
+
+        if ($ignore !== []) {
+            $small_words = \array_merge($small_words, $ignore);
+        }
+
+        $small_words_rx = \implode('|', $small_words);
+        $apostrophe_rx = '(?x: [\'’] [[:lower:]]* )?';
+
+        $str = \mb_strtolower(\trim($str));
+
+        // the main substitutions
+        /** @noinspection RegExpDuplicateAlternationBranch - false-positive - https://youtrack.jetbrains.com/issue/WI-51002 */
+        $str = (string) \preg_replace_callback(
+            '~\\b (_*) (?:                                                           # 1. Leading underscore and
+                        ( (?<=[ ][/\\\\]) [[:alpha:]]+ [-_[:alpha:]/\\\\]+ |                # 2. file path or 
+                          [-_[:alpha:]]+ [@.:] [-_[:alpha:]@.:/]+ ' . $apostrophe_rx . ' )  #    URL, domain, or email
+                        |
+                        ( (?i: ' . $small_words_rx . ' ) ' . $apostrophe_rx . ' )           # 3. or small word (case-insensitive)
+                        |
+                        ( [[:alpha:]] [[:lower:]\'’()\[\]{}]* ' . $apostrophe_rx . ' )     # 4. or word w/o internal caps
+                        |
+                        ( [[:alpha:]] [[:alpha:]\'’()\[\]{}]* ' . $apostrophe_rx . ' )     # 5. or some other word
+                      ) (_*) \\b                                                          # 6. With trailing underscore
+                    ~ux',
+            /**
+             * @param string[] $matches
+             *
+             * @psalm-pure
+             *
+             * @return string
+             */
+            static function (array $matches) use ($encoding): string {
+                // preserve leading underscore
+                $str = $matches[1];
+                if ($matches[2]) {
+                    // preserve URLs, domains, emails and file paths
+                    $str .= $matches[2];
+                } elseif ($matches[3]) {
+                    // lower-case small words
+                    $str .= \mb_strtolower($matches[3], $encoding);
+                } elseif ($matches[4]) {
+                    // capitalize word w/o internal caps
+                    $str .= ucfirst($matches[4]);
+                } else {
+                    // preserve other kinds of word (iPhone)
+                    $str .= $matches[5];
+                }
+                // preserve trailing underscore
+                $str .= $matches[6];
+
+                return $str;
+            },
+            $str
+        );
+
+        // Exceptions for small words: capitalize at start of title...
+        $str = (string) \preg_replace_callback(
+            '~(  \\A [[:punct:]]*            # start of title...
+                      |  [:.;?!][ ]+                # or of subsentence...
+                      |  [ ][\'"“‘(\[][ ]* )        # or of inserted subphrase...
+                      ( ' . $small_words_rx . ' ) \\b # ...followed by small word
+                     ~uxi',
+            /**
+             * @param string[] $matches
+             *
+             * @psalm-pure
+             */
+            static function (array $matches): string {
+                return $matches[1] . ucfirst($matches[2]);
+            },
+            $str
+        );
+
+        // ...and end of title
+        $str = (string) \preg_replace_callback(
+            '~\\b ( ' . $small_words_rx . ' ) # small word...
+                      (?= [[:punct:]]* \Z          # ...at the end of the title...
+                      |   [\'"’”)\]] [ ] )         # ...or of an inserted subphrase?
+                     ~uxi',
+            /**
+             * @param string[] $matches
+             *
+             * @psalm-pure
+             */
+            static function (array $matches): string {
+                return ucfirst($matches[1]);
+            },
+            $str
+        );
+
+        // Exceptions for small words in hyphenated compound words.
+        // e.g. "in-flight" -> In-Flight
+        $str = (string) \preg_replace_callback(
+            '~\\b
+                        (?<! -)                   # Negative lookbehind for a hyphen; we do not want to match man-in-the-middle but do want (in-flight)
+                        ( ' . $small_words_rx . ' )
+                        (?= -[[:alpha:]]+)        # lookahead for "-someword"
+                       ~uxi',
+            /**
+             * @param string[] $matches
+             *
+             * @psalm-pure
+             *
+             * @return string
+             */
+            static function (array $matches) use ($encoding): string {
+                return static::ucfirst($matches[1], $encoding);
+            },
+            $str
+        );
+
+        // e.g. "Stand-in" -> "Stand-In" (Stand is already capped at this point)
+        $str = (string) \preg_replace_callback(
+            '~\\b
+                      (?<!…)                    # Negative lookbehind for a hyphen; we do not want to match man-in-the-middle but do want (stand-in)
+                      ( [[:alpha:]]+- )         # $1 = first word and hyphen, should already be properly capped
+                      ( ' . $small_words_rx . ' ) # ...followed by small word
+                      (?!	- )                 # Negative lookahead for another -
+                     ~uxi',
+            /**
+             * @param string[] $matches
+             *
+             * @psalm-pure
+             *
+             * @return string
+             */
+            static function (array $matches) use ($encoding): string {
+                return $matches[1] . static::ucfirst($matches[2], $encoding);
+            },
+            $str
+        );
+
+        return $str;
+    }
 }
