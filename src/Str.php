@@ -381,17 +381,13 @@ class Str
      * @see https://gist.github.com/gruber/9f9e8650d68b13ce4d78
      * @see https://github.com/voku/portable-utf8/
      *
-     * @param array  $ignore   <p>An array of words not to capitalize.</p>
-     * @param string $encoding [optional] <p>Set the charset for e.g. "mb_" function</p>
+     * @param array $ignore <p>An array of words not to capitalize.</p>
      *
      * @return string
      *                <p>The titleized string.</p>
      */
-    public static function titleCase(
-        string $str,
-        array $ignore = [],
-        string $encoding = 'UTF-8'
-    ): string {
+    public static function titleCase(string $str, array $ignore = []): string
+    {
         if ($str === '') {
             return '';
         }
@@ -443,12 +439,8 @@ class Str
                     ~ux',
             /**
              * @param string[] $matches
-             *
-             * @psalm-pure
-             *
-             * @return string
              */
-            static function (array $matches) use ($encoding): string {
+            static function (array $matches): string {
                 // preserve leading underscore
                 $str = $matches[1];
                 if ($matches[2]) {
@@ -456,7 +448,7 @@ class Str
                     $str .= $matches[2];
                 } elseif ($matches[3]) {
                     // lower-case small words
-                    $str .= \mb_strtolower($matches[3], $encoding);
+                    $str .= \mb_strtolower($matches[3]);
                 } elseif ($matches[4]) {
                     // capitalize word w/o internal caps
                     $str .= ucfirst($matches[4]);
@@ -481,8 +473,6 @@ class Str
                      ~uxi',
             /**
              * @param string[] $matches
-             *
-             * @psalm-pure
              */
             static function (array $matches): string {
                 return $matches[1] . ucfirst($matches[2]);
@@ -498,8 +488,6 @@ class Str
                      ~uxi',
             /**
              * @param string[] $matches
-             *
-             * @psalm-pure
              */
             static function (array $matches): string {
                 return ucfirst($matches[1]);
@@ -517,13 +505,9 @@ class Str
                        ~uxi',
             /**
              * @param string[] $matches
-             *
-             * @psalm-pure
-             *
-             * @return string
              */
-            static function (array $matches) use ($encoding): string {
-                return static::ucfirst($matches[1], $encoding);
+            static function (array $matches): string {
+                return \ucfirst($matches[1]);
             },
             $str
         );
@@ -538,13 +522,9 @@ class Str
                      ~uxi',
             /**
              * @param string[] $matches
-             *
-             * @psalm-pure
-             *
-             * @return string
              */
-            static function (array $matches) use ($encoding): string {
-                return $matches[1] . static::ucfirst($matches[2], $encoding);
+            static function (array $matches): string {
+                return $matches[1] . \ucfirst($matches[2]);
             },
             $str
         );
