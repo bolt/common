@@ -166,6 +166,15 @@ class StrTest extends TestCase
             'You are the 🍏 to my 👁.',
             Str::placeholders('You are the {FOO} to my {BAR}.', ['foo' => '🍏', 'bar' => '👁'])
         );
+        $this->assertSame(
+            'You are the {foo} to my {bar}.',
+            Str::placeholders('You are the {foo} to my {bar}.', ['foo' => '🍏', 'bar' => '👁'])
+        );
+        $this->assertSame(
+            'You are the 🍏 to my 👁.',
+            Str::placeholders('You are the {foo} to my {bar}.', ['foo' => '🍏', 'bar' => '👁'], true)
+        );
+
     }
 
     public function testTitleCase()
