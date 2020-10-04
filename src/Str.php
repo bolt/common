@@ -310,52 +310,123 @@ class Str
     }
 
     /**
-     * @see https://gist.github.com/stemar/8287074
+     * Replace text within a portion of a multi-byte string
+     *
+     * Performs a multi-byte safe `{@link substr_replace()}` operation replacing a copy of `string` delimited by
+     * the `start` and (optionally) `length` parameters with the string given in `replacement`.
+     *
+     * @see http://php.net/manual/en/function.substr-replace.php
+     * @see http://php.net/manual/en/function.mb-substr.php
+     *
+     * @param mixed $string The input string.
+     *
+     * An array of strings can be provided, in which case the replacements will occur on each string in turn. In this case,
+     * the `replacement`, `start`, `length` and `encoding` parameters may be provided either as scalar
+     * values to be applied to each input string in turn, or as arrays, in which case the corresponding array element will
+     * be used for each input string.
+     *
+     * @param mixed $replacement The replacement string.
+     *
+     * @param mixed $start If `start` is positive, the replacing will begin at the `start`'th offset into
+     * `string`.
+     *
+     * If `start` is negative, the replacing will begin at the `start`'th character from the end of `string`.
+     *
+     * @param mixed $length [optional]
+     *
+     * If given and is positive, it represents the length of the portion of `string` which is to be replaced. If it is
+     * negative, it represents the number of characters from the end of `string` at which to stop replacing. If it is
+     * not given or equals to <b>NULL</b> or an empty string, then it will default to strlen( `string` ); i.e. end the
+     * replacing at the end of `string`. If `length` is zero then this function will have the effect of inserting
+     * `replacement` into `string` at the given `start` offset.
+     *
+     * @param mixed $encoding [optional]
+     *
+     * The `encoding` parameter is the character encoding. If it is omitted, the internal character encoding value will
+     * be used.
+     *
+     * @see https://gist.github.com/antichris/1dd951752f3da125d382420be21d5b16
+     *
+     * @return mixed The result string is returned. If `string` is an array then array is returned.
      */
-    public static function mb_substr_replace($string, $replacement, $start, $length = null)
+    public static function mb_substr_replace($string, $replacement, $start, $length = null, $encoding = null)
     {
+        if (!$encoding) {
+            $encoding = mb_internal_encoding();
+        }
+
         if (is_array($string)) {
-            $num = count($string);
+            $stringCount = count($string);
 
-            // $replacement
-            $replacement = is_array($replacement) ? array_slice($replacement, 0, $num) : array_pad([$replacement], $num, $replacement);
+            if (is_array($replacement)) {
+                if (count($replacement) < $stringCount) {
+                    $replacement = array_pad($replacement, $stringCount, '');
+                }
+            } else {
+                $replacement = array_fill(0, $stringCount, $replacement);
+            }
 
-            // $start
             if (is_array($start)) {
-                $start = array_slice($start, 0, $num);
-                foreach ($start as $key => $value) {
-                    $start[$key] = is_int($value) ? $value : 0;
+                if (count($start) < $stringCount) {
+                    $start = array_pad($start, $stringCount, 0);
                 }
             } else {
-                $start = array_pad([$start], $num, $start);
+                $start = array_fill(0, $stringCount, $start);
             }
 
-            // $length
-            if (! isset($length)) {
-                $length = array_fill(0, $num, 0);
-            } elseif (is_array($length)) {
-                $length = array_slice($length, 0, $num);
-                foreach ($length as $key => $value) {
-                    $length[$key] = isset($value) ? (is_int($value) ? $value : $num) : 0;
+            if (is_array($length)) {
+                if (count($length) < $stringCount) {
+                    $length = array_pad($length, $stringCount, null);
                 }
             } else {
-                $length = array_pad([$length], $num, $length);
+                $length = array_fill(0, $stringCount, $length);
             }
 
-            // Recursive call
-            return array_map(__FUNCTION__, $string, $replacement, $start, $length);
+            if (is_array($encoding)) {
+                if (count($encoding) < $stringCount) {
+                    $encoding = array_pad($encoding, $stringCount, mb_internal_encoding());
+                }
+            } else {
+                $encoding = array_fill(0, $stringCount, $encoding);
+            }
+
+            return array_map(__METHOD__, $string, $replacement, $start, $length, $encoding);
         }
 
-        preg_match_all('/./us', (string) $string, $smatches);
-        preg_match_all('/./us', (string) $replacement, $rmatches);
+        $stringLength = mb_strlen($string, $encoding);
 
-        if ($length === null) {
-            $length = mb_strlen($string);
+        if ($start < 0) {
+            if (-$start < $stringLength) {
+                $startNormalized = $stringLength + $start;
+            } else {
+                $startNormalized = 0;
+            }
+        } else if ($start > $stringLength) {
+            $startNormalized = $stringLength;
+        } else {
+            $startNormalized = $start;
         }
 
-        array_splice($smatches[0], $start, $length, $rmatches[0]);
+        if ($length === null || $length === '') {
+            $start2 = $stringLength;
+        } else if ($length < 0) {
+            $start2 = $stringLength + $length;
+            if ($start2 < $startNormalized) {
+                $start2 = $startNormalized;
+            }
+        } else {
+            $start2 = $startNormalized + $length;
+        }
 
-        return implode($smatches[0]);
+        $leader = $startNormalized
+            ? mb_substr($string, 0, $startNormalized, $encoding)
+            : '';
+
+        $trailer = $start2 < $stringLength
+            ? mb_substr($string, $start2, null, $encoding)
+            : '';
+
+        return "{$leader}{$replacement}{$trailer}";
     }
 
     public static function placeholders(string $string, array $replacements, bool $caseInsensitive = false): string
@@ -383,11 +454,10 @@ class Str
      * @see https://gist.github.com/gruber/9f9e8650d68b13ce4d78
      * @see https://github.com/voku/portable-utf8/
      *
-     * @param array  $ignore   <p>An array of words not to capitalize.</p>
-     * @param string $encoding [optional] <p>Set the charset for e.g. "mb_" function</p>
+     * @param array  $ignore   An array of words not to capitalize.
+     * @param string $encoding [optional] Set the charset for e.g. "mb_" function
      *
-     * @return string
-     *                <p>The titleized string.</p>
+     * @return string The titleized string.
      */
     public static function titleCase(
         string $str,
@@ -433,7 +503,7 @@ class Str
         /** @noinspection RegExpDuplicateAlternationBranch - false-positive - https://youtrack.jetbrains.com/issue/WI-51002 */
         $str = (string) \preg_replace_callback(
             '~\\b (_*) (?:                                                           # 1. Leading underscore and
-                        ( (?<=[ ][/\\\\]) [[:alpha:]]+ [-_[:alpha:]/\\\\]+ |                # 2. file path or 
+                        ( (?<=[ ][/\\\\]) [[:alpha:]]+ [-_[:alpha:]/\\\\]+ |                # 2. file path or
                           [-_[:alpha:]]+ [@.:] [-_[:alpha:]@.:/]+ ' . $apostrophe_rx . ' )  #    URL, domain, or email
                         |
                         ( (?i: ' . $small_words_rx . ' ) ' . $apostrophe_rx . ' )           # 3. or small word (case-insensitive)
