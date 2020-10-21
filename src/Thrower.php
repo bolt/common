@@ -11,7 +11,9 @@ namespace Bolt\Common;
  */
 class Thrower
 {
-    /** @var callable */
+    /**
+     * @var callable
+     */
     private static $handler;
 
     /** @noinspection PhpDocSignatureInspection */

@@ -19,7 +19,9 @@ use Traversable;
  */
 class Arr
 {
-    /** @var \stdClass|null Used with {@see remove} to unset value */
+    /**
+     * @var \stdClass|null Used with {@see remove} to unset value
+     */
     private static $unsetMarker;
 
     /**

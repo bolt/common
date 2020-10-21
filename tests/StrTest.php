@@ -194,6 +194,13 @@ class StrTest extends TestCase
             'A Test for a Small Word at Start of Line',
             Str::titleCase('a test for a small word at start of line')
         );
-
+        $this->assertSame(
+            'Weird Things Happen With Stand-In, or End in "A"',
+            Str::titleCase('Weird things happen with stand-in, or end in "a"')
+        );
+        $this->assertSame(
+            'Weird Things Happen With Stand-In, or End in A',
+            Str::titleCase('Weird things happen with stand-in, or end in a')
+        );
     }
 }

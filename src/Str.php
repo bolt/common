@@ -15,7 +15,9 @@ class Str
      */
     private static $slugifyInstance = null;
 
-    /** @var Slugify[] */
+    /**
+     * @var Slugify[]
+     */
     private static $slugifySafeInstances = [];
 
     /**
@@ -324,14 +326,11 @@ class Str
      * the `replacement`, `start`, `length` and `encoding` parameters may be provided either as scalar
      * values to be applied to each input string in turn, or as arrays, in which case the corresponding array element will
      * be used for each input string.
-     *
      * @param mixed $replacement The replacement string.
-     *
-     * @param mixed $start If `start` is positive, the replacing will begin at the `start`'th offset into
-     * `string`.
+     * @param mixed $start       If `start` is positive, the replacing will begin at the `start`'th offset into
+     *                           `string`.
      *
      * If `start` is negative, the replacing will begin at the `start`'th character from the end of `string`.
-     *
      * @param mixed $length [optional]
      *
      * If given and is positive, it represents the length of the portion of `string` which is to be replaced. If it is
@@ -339,7 +338,6 @@ class Str
      * not given or equals to <b>NULL</b> or an empty string, then it will default to strlen( `string` ); i.e. end the
      * replacing at the end of `string`. If `length` is zero then this function will have the effect of inserting
      * `replacement` into `string` at the given `start` offset.
-     *
      * @param mixed $encoding [optional]
      *
      * The `encoding` parameter is the character encoding. If it is omitted, the internal character encoding value will
@@ -351,7 +349,7 @@ class Str
      */
     public static function mb_substr_replace($string, $replacement, $start, $length = null, $encoding = null)
     {
-        if (!$encoding) {
+        if (! $encoding) {
             $encoding = mb_internal_encoding();
         }
 
@@ -401,7 +399,7 @@ class Str
             } else {
                 $startNormalized = 0;
             }
-        } else if ($start > $stringLength) {
+        } elseif ($start > $stringLength) {
             $startNormalized = $stringLength;
         } else {
             $startNormalized = $start;
@@ -409,7 +407,7 @@ class Str
 
         if ($length === null || $length === '') {
             $start2 = $stringLength;
-        } else if ($length < 0) {
+        } elseif ($length < 0) {
             $start2 = $stringLength + $length;
             if ($start2 < $startNormalized) {
                 $start2 = $startNormalized;
@@ -595,7 +593,7 @@ class Str
              * @return string
              */
             static function (array $matches) use ($encoding): string {
-                return static::ucfirst($matches[1], $encoding);
+                return ucfirst($matches[1]);
             },
             $str
         );
@@ -616,7 +614,7 @@ class Str
              * @return string
              */
             static function (array $matches) use ($encoding): string {
-                return $matches[1] . static::ucfirst($matches[2], $encoding);
+                return $matches[1] . ucfirst($matches[2]);
             },
             $str
         );

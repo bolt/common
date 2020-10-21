@@ -11,7 +11,9 @@ namespace Bolt\Common;
  */
 class Ini
 {
-    /** @var array [string key => bool editable] */
+    /**
+     * @var array [string key => bool editable]
+     */
     private static $keys = [];
 
     /**

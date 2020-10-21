@@ -8,11 +8,17 @@ use Seld\JsonLint\ParsingException as JsonParseException;
 
 class ParseException extends \RuntimeException
 {
-    /** @var int */
+    /**
+     * @var int
+     */
     private $parsedLine;
-    /** @var string|null */
+    /**
+     * @var string|null
+     */
     private $snippet;
-    /** @var string */
+    /**
+     * @var string
+     */
     private $rawMessage;
 
     /**
