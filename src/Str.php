@@ -589,10 +589,8 @@ class Str
              * @param string[] $matches
              *
              * @psalm-pure
-             *
-             * @return string
              */
-            static function (array $matches) use ($encoding): string {
+            static function (array $matches): string {
                 return ucfirst($matches[1]);
             },
             $str
@@ -610,15 +608,18 @@ class Str
              * @param string[] $matches
              *
              * @psalm-pure
-             *
-             * @return string
              */
-            static function (array $matches) use ($encoding): string {
+            static function (array $matches): string {
                 return $matches[1] . ucfirst($matches[2]);
             },
             $str
         );
 
         return $str;
+    }
+
+    public static function cleanWhitespace(string $str, string $charlist = " \t\n\r\0\x0B"): string
+    {
+        return trim(preg_replace('/[\t\n\r\s]+/', ' ', $str), $charlist);
     }
 }
