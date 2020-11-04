@@ -10,6 +10,8 @@ matrix:
     - php: 7.2
     - php: 7.3
       env: COMPOSER_FLAGS="--ignore-platform-reqs"
+    - php: 7.4
+      env: COMPOSER_FLAGS="--ignore-platform-reqs"
     - php: nightly
       env: COMPOSER_FLAGS="--ignore-platform-reqs"
   allow_failures:
@@ -19,7 +21,7 @@ before_install:
   # Set up Composer
   - composer self-update || true
   - mv ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini{,.disabled} || echo "xdebug not available"
-  
+
 install:
   - composer install --no-interaction $COMPOSER_FLAGS
 
