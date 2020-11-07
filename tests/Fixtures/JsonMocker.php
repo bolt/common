@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bolt\Common\Tests\Fixtures;
 
 use Bolt\Common\Json;
@@ -26,13 +28,11 @@ class JsonMocker
 
     /**
      * Return the singleton instance.
-     *
-     * @return JsonMocker
      */
-    public static function instance()
+    public static function instance(): self
     {
         static $instance;
-        if (!$instance) {
+        if (! $instance) {
             static::register();
             $instance = new static();
         }
@@ -46,7 +46,7 @@ class JsonMocker
      * We use eval() here so we can loop over methods to reduce boilerplate and so that our IDEs
      * don't pick up these methods and try to auto complete to them instead of the native methods.
      */
-    private static function register()
+    private static function register(): void
     {
         if (class_exists(Json::class, false)) {
             throw new \LogicException(sprintf('%s() must be called before %s is loaded', __METHOD__, Json::class));
@@ -73,7 +73,7 @@ PHP;
         $this->reset();
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->setEncoder();
         $this->setDecoder();
@@ -81,22 +81,22 @@ PHP;
         $this->setLastMessageGetter();
     }
 
-    public function setEncoder(callable $encoder = null)
+    public function setEncoder(?callable $encoder = null): void
     {
         $this->encoder = $encoder ?: 'json_encode';
     }
 
-    public function setDecoder(callable $decoder = null)
+    public function setDecoder(?callable $decoder = null): void
     {
         $this->decoder = $decoder ?: 'json_decode';
     }
 
-    public function setLastCodeGetter(callable $callable = null)
+    public function setLastCodeGetter(?callable $callable = null): void
     {
         $this->lastCodeGetter = $callable ?: 'json_last_error';
     }
 
-    public function setLastMessageGetter(callable $callable = null)
+    public function setLastMessageGetter(?callable $callable = null): void
     {
         $this->lastMsgGetter = $callable ?: 'json_last_error_msg';
     }

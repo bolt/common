@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bolt\Common\Tests;
 
 use Bolt\Common\Exception\DumpException;
@@ -12,15 +14,15 @@ use Bolt\Common\Serialization;
  */
 class SerializationTest extends TestCase
 {
-    public function testDump()
+    public function testDump(): void
     {
         $result = Serialization::dump(new \stdClass());
         $this->assertSame(serialize(new \stdClass()), $result);
     }
 
-    public function testDumpInvalid()
+    public function testDumpInvalid(): void
     {
-        if (!\defined('HHVM_VERSION')) {
+        if (! \defined('HHVM_VERSION')) {
             $message = "/Error serializing value\. Serialization of 'Closure' is not allowed/";
         } else {
             $message = '/Error serializing value\. Attempted to serialize unserializable builtin class Closure\$Bolt\\\\Common\\\\Tests\\\\SerializationTest::testDumpInvalid;\d+/';
@@ -28,10 +30,11 @@ class SerializationTest extends TestCase
         $this->expectException(DumpException::class);
         $this->expectExceptionMessageRegExp($message);
 
-        Serialization::dump(function () {});
+        Serialization::dump(function (): void {
+        });
     }
 
-    public function testParseSimple()
+    public function testParseSimple(): void
     {
         $result = Serialization::parse(serialize(new \stdClass()));
         $this->assertInstanceOf(\stdClass::class, $result);
@@ -41,7 +44,7 @@ class SerializationTest extends TestCase
      * @expectedException \Bolt\Common\Exception\ParseException
      * @expectedExceptionMessage Error parsing serialized value.
      */
-    public function testParseInvalidData()
+    public function testParseInvalidData(): void
     {
         Serialization::parse('O:9:"stdClass":0:{}');
     }
@@ -50,7 +53,7 @@ class SerializationTest extends TestCase
      * @expectedException \Bolt\Common\Exception\ParseException
      * @expectedExceptionMessage Error parsing serialized value. Could not find class: ThisClassShouldNotExistsDueToDropBears
      */
-    public function testParseClassNotFound()
+    public function testParseClassNotFound(): void
     {
         if (\defined('HHVM_VERSION')) {
             $this->markTestSkipped(

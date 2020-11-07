@@ -8,26 +8,20 @@ use Seld\JsonLint\ParsingException as JsonParseException;
 
 class ParseException extends \RuntimeException
 {
-    /**
-     * @var int
-     */
+    /** @var int */
     private $parsedLine;
-    /**
-     * @var string|null
-     */
+    /** @var string|null */
     private $snippet;
-    /**
-     * @var string
-     */
+    /** @var string */
     private $rawMessage;
 
     /**
      * Constructor.
      *
-     * @param string      $message    The error message
-     * @param int         $parsedLine The line where the error occurred
-     * @param string|null $snippet    The snippet of code near the problem
-     * @param \Throwable  $previous   The previous exception
+     * @param string $message The error message
+     * @param int $parsedLine The line where the error occurred
+     * @param string|null $snippet The snippet of code near the problem
+     * @param \Throwable $previous The previous exception
      */
     public function __construct(string $message, int $parsedLine = -1, ?string $snippet = null, int $code = 0, ?\Throwable $previous = null)
     {

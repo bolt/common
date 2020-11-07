@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bolt\Common\Tests;
 
 /**
@@ -17,7 +19,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * @param string $exception
      */
-    public function expectException($exception)
+    public function expectException($exception): void
     {
         if (method_exists(parent::class, __FUNCTION__)) {
             parent::expectException($exception);
@@ -33,7 +35,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * @param int|string $code
      */
-    public function expectExceptionCode($code)
+    public function expectExceptionCode($code): void
     {
         if (method_exists(parent::class, __FUNCTION__)) {
             parent::expectExceptionCode($code);
@@ -49,7 +51,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * @param string $message
      */
-    public function expectExceptionMessage($message)
+    public function expectExceptionMessage($message): void
     {
         if (method_exists(parent::class, __FUNCTION__)) {
             parent::expectExceptionMessage($message);
@@ -66,7 +68,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * @param string $messageRegExp
      */
-    public function expectExceptionMessageRegExp($messageRegExp)
+    public function expectExceptionMessageRegExp($messageRegExp): void
     {
         if (method_exists(parent::class, __FUNCTION__)) {
             parent::expectExceptionMessageRegExp($messageRegExp);
@@ -80,7 +82,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
         $this->updateParentExceptedException();
     }
 
-    private function updateParentExceptedException()
+    private function updateParentExceptedException(): void
     {
         if ($this->expectedExceptionMessageRegExp) {
             $this->setExpectedException(null, null, null);
@@ -94,25 +96,23 @@ class TestCase extends \PHPUnit\Framework\TestCase
     // Keep these so we know these methods are deprecated in 4.8.
 
     /**
-     * @param mixed  $exception
      * @param string $message
-     * @param int    $code
+     * @param int $code
      *
      * @deprecated Method deprecated since Release 5.2.0; use expectException() instead
      */
-    public function setExpectedException($exception, $message = null, $code = null)
+    public function setExpectedException($exception, $message = null, $code = null): void
     {
         parent::setExpectedException($exception, $message, $code);
     }
 
     /**
-     * @param mixed  $exception
      * @param string $messageRegExp
-     * @param int    $code
+     * @param int $code
      *
      * @deprecated Method deprecated since Release 5.6.0; use expectExceptionMessageRegExp() instead
      */
-    public function setExpectedExceptionRegExp($exception, $messageRegExp = null, $code = null)
+    public function setExpectedExceptionRegExp($exception, $messageRegExp = null, $code = null): void
     {
         parent::setExpectedExceptionRegExp($exception, $messageRegExp, $code);
     }

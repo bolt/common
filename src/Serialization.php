@@ -33,7 +33,7 @@ class Serialization
      * Parse (Unserialize) value.
      *
      * @param string $value
-     * @param array  $options
+     * @param array $options
      *
      * @throws ParseException when unserializing fails
      */

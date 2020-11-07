@@ -1,48 +1,50 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bolt\Common\Tests;
 
 use Bolt\Common\Ini;
 
 class IniTest extends TestCase
 {
-    const STR_KEY = 'user_agent';
-    const BOOL_KEY = 'assert.bail';
-    const NUMERIC_KEY = 'date.default_latitude';
-    const BYTES_KEY = 'memory_limit';
-    const VALIDATED_KEY = 'precision';
+    public const STR_KEY = 'user_agent';
+    public const BOOL_KEY = 'assert.bail';
+    public const NUMERIC_KEY = 'date.default_latitude';
+    public const BYTES_KEY = 'memory_limit';
+    public const VALIDATED_KEY = 'precision';
 
-    const READ_ONLY_KEY = 'allow_url_fopen';
-    const TRIGGERS_ERROR_KEY = 'session.name';
-    const NONEXISTENT_KEY = 'herp.derp';
-    const SILENT_ERROR_KEY = 'session.gc_maxlifetime';
+    public const READ_ONLY_KEY = 'allow_url_fopen';
+    public const TRIGGERS_ERROR_KEY = 'session.name';
+    public const NONEXISTENT_KEY = 'herp.derp';
+    public const SILENT_ERROR_KEY = 'session.gc_maxlifetime';
 
     private $backup;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->backup = [
-            static::STR_KEY     => ini_get(static::STR_KEY),
-            static::BOOL_KEY    => ini_get(static::BOOL_KEY),
+            static::STR_KEY => ini_get(static::STR_KEY),
+            static::BOOL_KEY => ini_get(static::BOOL_KEY),
             static::NUMERIC_KEY => ini_get(static::NUMERIC_KEY),
-            static::BYTES_KEY   => ini_get(static::BYTES_KEY),
+            static::BYTES_KEY => ini_get(static::BYTES_KEY),
         ];
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         foreach ($this->backup as $key => $value) {
             ini_set($key, $value);
         }
     }
 
-    public function testHas()
+    public function testHas(): void
     {
         $this->assertTrue(Ini::has(static::STR_KEY));
         $this->assertFalse(Ini::has(static::NONEXISTENT_KEY));
     }
 
-    public function testGetStr()
+    public function testGetStr(): void
     {
         ini_set(static::STR_KEY, '');
         $this->assertSame('default', Ini::getStr(static::STR_KEY, 'default'));
@@ -53,7 +55,7 @@ class IniTest extends TestCase
         $this->assertNull(Ini::getStr(static::NONEXISTENT_KEY));
     }
 
-    public function testGetBool()
+    public function testGetBool(): void
     {
         ini_set(static::BOOL_KEY, '0');
         $this->assertFalse(Ini::getBool(static::BOOL_KEY));
@@ -67,9 +69,9 @@ class IniTest extends TestCase
         $this->assertFalse(Ini::getBool(static::NONEXISTENT_KEY));
     }
 
-    public function testGetNumeric()
+    public function testGetNumeric(): void
     {
-        if (!\defined('HHVM_VERSION')) {
+        if (! \defined('HHVM_VERSION')) {
             ini_set(static::NUMERIC_KEY, '');
             $this->assertSame(4.0, Ini::getNumeric(static::NUMERIC_KEY, 4.0));
         }
@@ -105,10 +107,9 @@ class IniTest extends TestCase
      * @dataProvider provideBytes
      *
      * @param string|null $value
-     * @param mixed       $expected
-     * @param string      $key
+     * @param string $key
      */
-    public function testGetBytes($value, $expected, $key = self::BYTES_KEY)
+    public function testGetBytes($value, $expected, $key = self::BYTES_KEY): void
     {
         if ($value !== null) {
             Ini::set($key, $value);
@@ -116,13 +117,13 @@ class IniTest extends TestCase
         $this->assertSame($expected, Ini::getBytes($key));
     }
 
-    public function testSet()
+    public function testSet(): void
     {
         Ini::set(static::STR_KEY, 'foo');
         $this->assertSame('foo', ini_get(static::STR_KEY));
     }
 
-    public function testSetBoolean()
+    public function testSetBoolean(): void
     {
         Ini::set(static::BOOL_KEY, false);
         $this->assertSame('0', ini_get(static::BOOL_KEY));
@@ -131,7 +132,7 @@ class IniTest extends TestCase
         $this->assertSame('1', ini_get(static::BOOL_KEY));
     }
 
-    public function testSetInvalidType()
+    public function testSetInvalidType(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('ini values must be scalar or null. Got: array');
@@ -139,7 +140,7 @@ class IniTest extends TestCase
         Ini::set(static::NUMERIC_KEY, []);
     }
 
-    public function testSetInvalidValue()
+    public function testSetInvalidValue(): void
     {
         if (\defined('HHVM_VERSION')) {
             $this->markTestSkipped('HHVM does not disallow this.');
@@ -154,10 +155,10 @@ class IniTest extends TestCase
     /**
      * @doesNotPerformAssertions
      */
-    public function testSetInvalidValueSilentError()
+    public function testSetInvalidValueSilentError(): void
     {
         // PHP allows setting floats on int keys, HHVM does not.
-        if (!\defined('HHVM_VERSION')) {
+        if (! \defined('HHVM_VERSION')) {
             return;
         }
 
@@ -167,7 +168,7 @@ class IniTest extends TestCase
         Ini::set(static::SILENT_ERROR_KEY, 5.5);
     }
 
-    public function testSetInvalidValueErrorTriggered()
+    public function testSetInvalidValueErrorTriggered(): void
     {
         if (\defined('HHVM_VERSION')) {
             $this->markTestSkipped('HHVM does not trigger error.');
@@ -175,9 +176,9 @@ class IniTest extends TestCase
 
         try {
             Ini::set(static::TRIGGERS_ERROR_KEY, '');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
         }
-        if (!isset($e)) {
+        if (! isset($e)) {
             $this->fail('Exception should be thrown');
 
             return;
@@ -190,7 +191,7 @@ class IniTest extends TestCase
         );
     }
 
-    public function testSetNewKey()
+    public function testSetNewKey(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(sprintf("The ini option '%s' does not exist. New ini options cannot be added.", static::NONEXISTENT_KEY));
@@ -198,7 +199,7 @@ class IniTest extends TestCase
         Ini::set(static::NONEXISTENT_KEY, 'foo');
     }
 
-    public function testSetUnauthorized()
+    public function testSetUnauthorized(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(sprintf("Unable to change ini option '%s', because it is not editable at runtime.", static::READ_ONLY_KEY));

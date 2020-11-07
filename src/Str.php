@@ -15,9 +15,7 @@ class Str
      */
     private static $slugifyInstance = null;
 
-    /**
-     * @var Slugify[]
-     */
+    /** @var Slugify[] */
     private static $slugifySafeInstances = [];
 
     /**
@@ -66,7 +64,7 @@ class Str
      * Splits a $subject on the $delimiter and returns the first part.
      * If the delimiter is not found in the string the string is returned.
      *
-     * @param string $subject   The string to split
+     * @param string $subject The string to split
      * @param string $delimiter The term to split on
      *
      * @throws \InvalidArgumentException
@@ -84,7 +82,7 @@ class Str
      * Splits a $subject on the $delimiter and returns the last part.
      * If the delimiter is not found in the string the string is returned.
      *
-     * @param string $subject   The string to split
+     * @param string $subject The string to split
      * @param string $delimiter The term to split on
      *
      * @throws \InvalidArgumentException
@@ -183,8 +181,8 @@ class Str
     /**
      * Converts a string from snake case to camel case.
      *
-     * @param string $text               The text to camel case
-     * @param bool   $lowercaseFirstChar Whether to lowercase the first character. 'fooBar' vs 'FooBar'.
+     * @param string $text The text to camel case
+     * @param bool $lowercaseFirstChar Whether to lowercase the first character. 'fooBar' vs 'FooBar'.
      *
      * @return string The camel cased text
      */
@@ -261,6 +259,7 @@ class Str
         if (self::$slugifyInstance === null) {
             self::$slugifyInstance = Slugify::create();
         }
+
         return self::$slugifyInstance;
     }
 
@@ -327,7 +326,7 @@ class Str
      * values to be applied to each input string in turn, or as arrays, in which case the corresponding array element will
      * be used for each input string.
      * @param mixed $replacement The replacement string.
-     * @param mixed $start       If `start` is positive, the replacing will begin at the `start`'th offset into
+     * @param mixed $start If `start` is positive, the replacing will begin at the `start`'th offset into
      *                           `string`.
      *
      * If `start` is negative, the replacing will begin at the `start`'th character from the end of `string`.
@@ -435,6 +434,7 @@ class Str
             $regex,
             function ($matches) use ($replacements) {
                 $key = mb_strtolower($matches[1]);
+
                 return array_key_exists($key, $replacements) ? $replacements[$key] : $matches[0];
             },
             $string
@@ -452,7 +452,7 @@ class Str
      * @see https://gist.github.com/gruber/9f9e8650d68b13ce4d78
      * @see https://github.com/voku/portable-utf8/
      *
-     * @param array  $ignore   An array of words not to capitalize.
+     * @param array $ignore An array of words not to capitalize.
      * @param string $encoding [optional] Set the charset for e.g. "mb_" function
      *
      * @return string The titleized string.
