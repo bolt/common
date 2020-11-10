@@ -283,7 +283,7 @@ class ArrTest extends TestCase
     {
         return [
             'bad definition' => [TestBadDefinitionArrayLike::class],
-//            'bad logic' => [TestBadLogicArrayLike::class],
+            //            'bad logic' => [TestBadLogicArrayLike::class],
             'bad expression' => [TestBadReferenceExpressionArrayLike::class],
         ];
     }
@@ -311,7 +311,6 @@ class ArrTest extends TestCase
         } catch (\Exception $e) {
         } catch (\Throwable $e) {
         }
-
 
         if ($e instanceof \RuntimeException) {
             $this->assertSame(

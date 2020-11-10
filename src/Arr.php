@@ -176,7 +176,7 @@ class Arr
             if (! ($data instanceof ArrayAccess) && ! is_array($data)) {
                 return false;
             }
-            if (! (isset($data[$part]) || array_key_exists($part, $data))) {
+            if (! isset($data[$part])) {
                 return false;
             }
             $data = $data[$part];

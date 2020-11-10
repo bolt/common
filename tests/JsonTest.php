@@ -32,7 +32,7 @@ class JsonTest extends TestCase
     {
         try {
             $line = __LINE__ + 1;
-            $result = Json::parse(new TestStringable(''));
+            Json::parse(new TestStringable(''));
         } catch (\Exception $e) {
         } catch (\Throwable $e) {
         }
@@ -40,13 +40,12 @@ class JsonTest extends TestCase
         if ($e instanceof \TypeError) {
             $this->assertSame(
                 "Argument 1 passed to Bolt\Common\Json::parse() must be of the type string or null, " .
-                "object given, called in " . __FILE__ . " on line " . $line,
+                'object given, called in ' . __FILE__ . ' on line ' . $line,
                 $e->getMessage()
             );
         } else {
             $this->fail("Json::parse should've thrown a TypeError");
         }
-
     }
 
     public function testParseErrorDetectExtraComma(): void
