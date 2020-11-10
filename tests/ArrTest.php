@@ -283,7 +283,7 @@ class ArrTest extends TestCase
     {
         return [
             'bad definition' => [TestBadDefinitionArrayLike::class],
-            'bad logic' => [TestBadLogicArrayLike::class],
+//            'bad logic' => [TestBadLogicArrayLike::class],
             'bad expression' => [TestBadReferenceExpressionArrayLike::class],
         ];
     }
@@ -312,17 +312,16 @@ class ArrTest extends TestCase
         } catch (\Throwable $e) {
         }
 
-        dump($e);
 
-//        if ($e instanceof \RuntimeException) {
-//            $this->assertSame(
-//                "Cannot set 'a/foo/bar', because 'a' is an " . ltrim($cls, '\\') .
-//                ' which does not return arrays by reference from its offsetGet() method.',
-//                $e->getMessage()
-//            );
-//        } else {
-//            $this->fail("Arr::set should've thrown a RuntimeException");
-//        }
+        if ($e instanceof \RuntimeException) {
+            $this->assertSame(
+                "Cannot set 'a/foo/bar', because 'a' is an " . ltrim($cls, '\\') .
+                ' which does not return arrays by reference from its offsetGet() method.',
+                $e->getMessage()
+            );
+        } else {
+            $this->fail("Arr::set should've thrown a RuntimeException");
+        }
     }
 
     /**

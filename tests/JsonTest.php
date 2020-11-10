@@ -30,14 +30,31 @@ class JsonTest extends TestCase
 
     public function testParseErrorObjectEmptyString(): void
     {
-        $this->expectParseException(new TestStringable(''), 0);
+        try {
+            $line = __LINE__ + 1;
+            $result = Json::parse(new TestStringable(''));
+        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+        }
+
+        if ($e instanceof \TypeError) {
+            $this->assertSame(
+                "Argument 1 passed to Bolt\Common\Json::parse() must be of the type string or null, " .
+                "object given, called in " . __FILE__ . " on line " . $line,
+                $e->getMessage()
+            );
+        } else {
+            $this->fail("Json::parse should've thrown a TypeError");
+        }
+
     }
 
     public function testParseErrorDetectExtraComma(): void
     {
         $json = '{
-        "foo": "bar",
-}';
+            "foo": "bar",
+        }';
+
         $this->expectParseException($json, 2, 'It appears you have an extra trailing comma');
     }
 
