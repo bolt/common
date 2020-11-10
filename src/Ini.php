@@ -11,9 +11,7 @@ namespace Bolt\Common;
  */
 class Ini
 {
-    /**
-     * @var array [string key => bool editable]
-     */
+    /** @var array [string key => bool editable] */
     private static $keys = [];
 
     /**
@@ -53,7 +51,7 @@ class Ini
      *
      * If the key does not exist or the value is empty the given default is returned.
      *
-     * @param string         $key
+     * @param string $key
      * @param int|float|null $default
      *
      * @return int|float|null
@@ -70,7 +68,7 @@ class Ini
      *
      * Note that floats are converted to ints before being multiplied by their unit. Thus 5.5M == 5M and 0.5M == 0.
      *
-     * @param string   $key
+     * @param string $key
      * @param int|null $default
      */
     public static function getBytes($key, $default = null): ?int
@@ -97,7 +95,7 @@ class Ini
      * @param string $key
      *
      * @throws \InvalidArgumentException when the value is not scalar or null
-     * @throws \RuntimeException         when the key does not exist, it is not editable, or some unknown reason
+     * @throws \RuntimeException when the key does not exist, it is not editable, or some unknown reason
      */
     public static function set($key, $value): void
     {
@@ -114,18 +112,10 @@ class Ini
 
         if ($result === false || $ex !== null) {
             if (! static::has($key)) {
-                throw new \RuntimeException(
-                    "The ini option '${key}' does not exist. New ini options cannot be added.",
-                    0,
-                    $ex
-                );
+                throw new \RuntimeException("The ini option '${key}' does not exist. New ini options cannot be added.", 0, $ex);
             }
             if (! static::$keys[$key]) {
-                throw new \RuntimeException(
-                    "Unable to change ini option '${key}', because it is not editable at runtime.",
-                    0,
-                    $ex
-                );
+                throw new \RuntimeException("Unable to change ini option '${key}', because it is not editable at runtime.", 0, $ex);
             }
 
             $value = Assert::valueToString($value);

@@ -35,11 +35,11 @@ final class Json
     /**
      * Wrapper for json_decode that throws when an error occurs.
      *
-     * @param string $json    JSON data to parse
-     * @param bool   $assoc   When true, returned objects will be converted
+     * @param string $json JSON data to parse
+     * @param bool $assoc When true, returned objects will be converted
      *                        into associative arrays.
-     * @param int    $depth   User specified recursion depth.
-     * @param int    $options Bitmask of JSON decode options.
+     * @param int $depth User specified recursion depth.
+     * @param int $options Bitmask of JSON decode options.
      *
      * @throws \InvalidArgumentException if the JSON cannot be decoded.
      *
@@ -49,9 +49,7 @@ final class Json
     {
         $data = \json_decode($json, $assoc, $depth, $options);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \InvalidArgumentException(
-                'json_decode error: ' . json_last_error_msg()
-            );
+            throw new \InvalidArgumentException('json_decode error: ' . json_last_error_msg());
         }
 
         return $data;
@@ -60,9 +58,9 @@ final class Json
     /**
      * Wrapper for JSON encoding that throws when an error occurs.
      *
-     * @param mixed $value   The value being encoded
-     * @param int   $options JSON encode option bitmask
-     * @param int   $depth   Set the maximum depth. Must be greater than zero.
+     * @param mixed $value The value being encoded
+     * @param int $options JSON encode option bitmask
+     * @param int $depth Set the maximum depth. Must be greater than zero.
      *
      * @throws \InvalidArgumentException if the JSON cannot be encoded.
      *
@@ -72,9 +70,7 @@ final class Json
     {
         $json = \json_encode($value, $options, $depth);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \InvalidArgumentException(
-                'json_encode error: ' . json_last_error_msg()
-            );
+            throw new \InvalidArgumentException('json_encode error: ' . json_last_error_msg());
         }
 
         return $json;
@@ -83,10 +79,10 @@ final class Json
     /**
      * Dumps a array/object into a JSON string.
      *
-     * @param mixed $data    Data to encode into a formatted JSON string
-     * @param int   $options Bitmask of JSON encode options
+     * @param mixed $data Data to encode into a formatted JSON string
+     * @param int $options Bitmask of JSON encode options
      *                       (defaults to JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
-     * @param int   $depth   Set the maximum depth. Must be greater than zero.
+     * @param int $depth Set the maximum depth. Must be greater than zero.
      *
      * @throws DumpException If dumping fails
      */
@@ -119,7 +115,7 @@ final class Json
      * Parses JSON into a PHP array.
      *
      * @param int $options Bitmask of JSON decode options
-     * @param int $depth   Recursion depth
+     * @param int $depth Recursion depth
      *
      * @throws ParseException If the JSON is not valid
      */

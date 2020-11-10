@@ -26,8 +26,8 @@ class Deprecated
      *     }
      * Will trigger: "Foo::world() is deprecated since 3.3 and will be removed in 4.0. Use hello() instead."
      *
-     * @param float|null $since   The version it was deprecated in
-     * @param string     $suggest a method or class or suggestion of what to use instead.
+     * @param float|null $since The version it was deprecated in
+     * @param string $suggest a method or class or suggestion of what to use instead.
      *                            If it is a class and the class has a matching method name,
      *                            that will be the suggestion
      * @param string|int $subject The method or class name or the index of the call stack to reference
@@ -86,9 +86,7 @@ class Deprecated
             // else we would be saying "require() is deprecated" lol.
             if (! function_exists($frame['function'])) {
                 $frame = $stack[$index - $offset];
-                throw new \InvalidArgumentException(
-                    sprintf('%s::%s() must be called from within a function/method.', $frame['class'], $frame['function'])
-                );
+                throw new \InvalidArgumentException(sprintf('%s::%s() must be called from within a function/method.', $frame['class'], $frame['function']));
             }
 
             return [
@@ -104,7 +102,8 @@ class Deprecated
         $constructor = $function === '__construct';
 
         if ($function === '__call' || $function === '__callStatic') {
-            $frame = debug_backtrace(0, $index + 1)[$index]; // with args
+            // with args
+            $frame = debug_backtrace(0, $index + 1)[$index];
             $function = $frame['args'][0];
         }
 
@@ -118,9 +117,9 @@ class Deprecated
     /**
      * Shortcut for triggering a deprecation warning for a class.
      *
-     * @param string     $class   The class that is deprecated
-     * @param float|null $since   The version it was deprecated in
-     * @param string     $suggest A class or suggestion of what to use instead
+     * @param string $class The class that is deprecated
+     * @param float|null $since The version it was deprecated in
+     * @param string $suggest A class or suggestion of what to use instead
      */
     public static function cls($class, $since = null, $suggest = null): void
     {
@@ -146,9 +145,9 @@ class Deprecated
      *     Deprecated::warn('Doing foo', 3.3, 'Do bar instead');
      *     // triggers warning: "Doing foo is deprecated since 3.3 and will be removed in 4.0. Do bar instead."
      *
-     * @param string     $subject The thing that is deprecated
-     * @param float|null $since   The version it was deprecated in
-     * @param string     $suggest A suggestion of what to do instead
+     * @param string $subject The thing that is deprecated
+     * @param float|null $since The version it was deprecated in
+     * @param string $suggest A suggestion of what to do instead
      */
     public static function warn($subject, $since = null, $suggest = ''): void
     {

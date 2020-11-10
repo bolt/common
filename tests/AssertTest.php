@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bolt\Common\Tests;
 
 use Bolt\Common\Assert;
 
 class AssertTest extends TestCase
 {
-    public function testIsArrayAccessible()
+    public function testIsArrayAccessible(): void
     {
         Assert::isArrayAccessible([1, 2, 3]);
         Assert::isArrayAccessible(new \ArrayObject([1, 2, 3]));
@@ -17,7 +19,7 @@ class AssertTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testIsArrayAccessibleFailsScalar()
+    public function testIsArrayAccessibleFailsScalar(): void
     {
         Assert::isArrayAccessible(123);
     }
@@ -25,15 +27,17 @@ class AssertTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testIsArrayAccessibleFailsObject()
+    public function testIsArrayAccessibleFailsObject(): void
     {
         Assert::isArrayAccessible(new \stdClass());
     }
 
-    public function testIsInstanceOfAny()
+    public function testIsInstanceOfAny(): void
     {
-        Assert::isInstanceOfAny(new \ArrayIterator(), [\Iterator::class, \ArrayAccess::class]); // both
-        Assert::isInstanceOfAny(new \Exception(), [\Exception::class, \Countable::class]); // one of
+        // both
+        Assert::isInstanceOfAny(new \ArrayIterator(), [\Iterator::class, \ArrayAccess::class]);
+        // one of
+        Assert::isInstanceOfAny(new \Exception(), [\Throwable::class, \Countable::class]);
 
         $this->addToAssertionCount(2);
     }
@@ -41,20 +45,22 @@ class AssertTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testIsInstanceOfAnyFailsScalar()
+    public function testIsInstanceOfAnyFailsScalar(): void
     {
-        Assert::isInstanceOfAny(new \Exception(), [\ArrayAccess::class, \Countable::class]); // neither
+        // neither
+        Assert::isInstanceOfAny(new \Exception(), [\ArrayAccess::class, \Countable::class]);
     }
 
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testIsInstanceOfAnyFailsObject()
+    public function testIsInstanceOfAnyFailsObject(): void
     {
-        Assert::isInstanceOfAny([], [\stdClass::class]); // scalar
+        // scalar
+        Assert::isInstanceOfAny([], [\stdClass::class]);
     }
 
-    public function testIsIterable()
+    public function testIsIterable(): void
     {
         Assert::isIterable([1, 2, 3]);
         Assert::isIterable(new \ArrayObject([1, 2, 3]));
@@ -65,7 +71,7 @@ class AssertTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testIsIterableFailsScalar()
+    public function testIsIterableFailsScalar(): void
     {
         Assert::isIterable(123);
     }
@@ -73,12 +79,12 @@ class AssertTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testIsIterableFailsObject()
+    public function testIsIterableFailsObject(): void
     {
         Assert::isIterable(new \stdClass());
     }
 
-    public function testValueToString()
+    public function testValueToString(): void
     {
         $this->assertSame('"foo"', Assert::valueToString('foo'));
     }

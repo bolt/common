@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bolt\Common\Tests;
 
 use Bolt\Common\Thrower;
 
 class ThrowerTest extends TestCase
 {
-    public function testSet()
+    public function testSet(): void
     {
         $orig = $this->getHandler();
 
@@ -21,7 +23,7 @@ class ThrowerTest extends TestCase
         $this->assertSame($orig, $now);
     }
 
-    public function testSetUsesSameHandler()
+    public function testSetUsesSameHandler(): void
     {
         Thrower::set();
         Thrower::set();
@@ -34,7 +36,7 @@ class ThrowerTest extends TestCase
         $this->assertSame($handler1, $handler2);
     }
 
-    public function testCall()
+    public function testCall(): void
     {
         $origHandler = $this->getHandler();
 
@@ -55,19 +57,19 @@ class ThrowerTest extends TestCase
         $this->assertSame($origHandler, $nowHandler);
     }
 
-    public function testCallWithError()
+    public function testCallWithError(): void
     {
         $origHandler = $this->getHandler();
 
         $e = null;
         try {
             Thrower::call(
-                function () {
+                function (): void {
                     trigger_error('I errored', E_USER_ERROR);
                 }
             );
         } catch (\ErrorException $e) {
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
         }
 
         $this->assertInstanceOf(\ErrorException::class, $e);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bolt\Common\Tests\Fixtures;
 
 class TestArrayLike implements \ArrayAccess
@@ -16,12 +18,13 @@ class TestArrayLike implements \ArrayAccess
         return isset($this->items[$offset]);
     }
 
-    public function &offsetGet($offset) // Note "&"
+    // Note "&"
+    public function &offsetGet($offset)
     {
         return $this->items[$offset];
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if ($offset === null) {
             $this->items[] = $value;
@@ -30,7 +33,7 @@ class TestArrayLike implements \ArrayAccess
         }
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->items[$offset]);
     }

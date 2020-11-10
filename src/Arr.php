@@ -19,9 +19,7 @@ use Traversable;
  */
 class Arr
 {
-    /**
-     * @var \stdClass|null Used with {@see remove} to unset value
-     */
+    /** @var \stdClass|null Used with {@see remove} to unset value */
     private static $unsetMarker;
 
     /**
@@ -91,9 +89,9 @@ class Arr
      * it allows for mapping a list of objects implementing `ArrayAccess`, and allows for mapping a list of
      * object properties (which was added to the builtin function in PHP 7.0).
      *
-     * @param iterable        $input     A list of arrays or objects from which to pull a column of values
+     * @param iterable $input A list of arrays or objects from which to pull a column of values
      * @param string|int|null $columnKey The key of the values to return or `null` for no change
-     * @param string|int|null $indexKey  The key of the keys to return or `null` for no change
+     * @param string|int|null $indexKey The key of the keys to return or `null` for no change
      */
     public static function column($input, $columnKey, $indexKey = null): array
     {
@@ -164,7 +162,7 @@ class Arr
      * `offsetGet`, and I would agree. Regardless I think this is nicer syntax.
      *
      * @param array|ArrayAccess $data Data to check values from
-     * @param string            $path Path to traverse and check keys from
+     * @param string $path Path to traverse and check keys from
      */
     public static function has($data, string $path): bool
     {
@@ -178,7 +176,7 @@ class Arr
             if (! ($data instanceof ArrayAccess) && ! is_array($data)) {
                 return false;
             }
-            if (! (isset($data[$part]) || array_key_exists($part, $data))) {
+            if (! isset($data[$part])) {
                 return false;
             }
             $data = $data[$part];
@@ -203,9 +201,9 @@ class Arr
      *
      * This code is adapted from Michael Dowling in his Guzzle library.
      *
-     * @param array|ArrayAccess $data    Data to retrieve values from
-     * @param string            $path    Path to traverse and retrieve a value from
-     * @param mixed|null        $default Default value to return if key does not exist
+     * @param array|ArrayAccess $data Data to retrieve values from
+     * @param string $path Path to traverse and retrieve a value from
+     * @param mixed|null $default Default value to return if key does not exist
      *
      * @return mixed|null
      */
@@ -257,9 +255,9 @@ class Arr
      *
      * This code is adapted from Michael Dowling in his Guzzle library.
      *
-     * @param array|ArrayAccess $data  Data to modify by reference
-     * @param string            $path  Path to set
-     * @param mixed             $value Value to set at the key
+     * @param array|ArrayAccess $data Data to modify by reference
+     * @param string $path Path to set
+     * @param mixed $value Value to set at the key
      *
      * @throws \ErrorException
      */
@@ -288,13 +286,7 @@ class Arr
 
         while ($key !== null) {
             if (! is_array($current) && ! ($current instanceof ArrayAccess)) {
-                throw new RuntimeException(
-                    sprintf(
-                        "Cannot set '%s', because '%s' is already set and not an array or an object implementing ArrayAccess.",
-                        $path,
-                        $invalidKey
-                    )
-                );
+                throw new RuntimeException(sprintf("Cannot set '%s', because '%s' is already set and not an array or an object implementing ArrayAccess.", $path, $invalidKey));
             }
             if (! $queue) {
                 if ($key === '[]') {
@@ -314,23 +306,15 @@ class Arr
 
             $next = null;
             if ($current instanceof ArrayAccess && ! static::canReturnArraysByReference($current, $key, $next, $e)) {
-                throw new RuntimeException(
-                    sprintf(
-                        "Cannot set '%s', because '%s' is an %s which does not return arrays by reference from its offsetGet() method.",
-                        $path,
-                        $invalidKey,
-                        \get_class($current)
-                    ),
-                    0,
-                    $e
-                );
+                throw new RuntimeException(sprintf("Cannot set '%s', because '%s' is an %s which does not return arrays by reference from its offsetGet() method.", $path, $invalidKey, \get_class($current)), 0, $e);
             }
 
             // If checking if object can return arrays by ref needed to fetch the value in the object then
             // use that so we don't have to fetch the value again.
             if ($next !== null) {
                 $current = &$next;
-                unset($next); // so assigning null above doesn't wipe out actual data
+                // so assigning null above doesn't wipe out actual data
+                unset($next);
             } else {
                 $current = &$current[$key];
             }
@@ -357,9 +341,9 @@ class Arr
      * Note: To remove values in arrays that are in `ArrayAccess` objects their
      * `offsetGet()` method needs to be able to return arrays by reference.
      *
-     * @param array|ArrayAccess $data    Data to retrieve remove value from
-     * @param string            $path    Path to traverse
-     * @param mixed|null        $default Default value to return if key does not exist
+     * @param array|ArrayAccess $data Data to retrieve remove value from
+     * @param string $path Path to traverse
+     * @param mixed|null $default Default value to return if key does not exist
      *
      * @throws \ErrorException
      */
@@ -541,9 +525,9 @@ class Arr
     /**
      * Determine whether the ArrayAccess object can return by reference.
      *
-     * @param string           $key   The key to try with
+     * @param string $key The key to try with
      * @param ArrayAccess|null $value The value if it needed to be fetched
-     * @param \ErrorException  $ex
+     * @param \ErrorException $ex
      *
      * @throws \ErrorException
      * @throws \ReflectionException
@@ -634,7 +618,7 @@ class Arr
      *     // => [1, 2, 3, 4]
      *
      * @param iterable $iterable The iterable to flatten
-     * @param int      $depth    How deep to flatten
+     * @param int $depth How deep to flatten
      */
     public static function flatten($iterable, $depth = 1): array
     {
@@ -643,15 +627,16 @@ class Arr
         return static::doFlatten(
             $iterable,
             $depth,
-            'is_iterable' // This may be more configurable in the future.
+            // This may be more configurable in the future.
+            'is_iterable'
         );
     }
 
     /**
      * Internal method to do actual flatten recursion after args have been validated by main method.
      *
-     * @param iterable $iterable  The iterable to flatten
-     * @param int      $depth     How deep to flatten
+     * @param iterable $iterable The iterable to flatten
+     * @param int $depth How deep to flatten
      * @param callable $predicate Whether to recurse the item
      */
     private static function doFlatten($iterable, $depth, callable $predicate, array $result = []): array

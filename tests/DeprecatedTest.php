@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bolt\Common\Tests;
 
 use Bolt\Common\Deprecated;
@@ -12,37 +14,37 @@ class DeprecatedTest extends TestCase
 {
     protected $deprecations = [];
 
-    public function testMethod()
+    public function testMethod(): void
     {
         Deprecated::method(3.0, 'baz', 'Foo::bar');
         $this->assertDeprecation('Foo::bar() is deprecated since 3.0 and will be removed in 4.0. Use baz() instead.');
     }
 
-    public function testMethodSentenceSuggestion()
+    public function testMethodSentenceSuggestion(): void
     {
         Deprecated::method(null, 'Do it this way instead.', 'Foo::bar');
         $this->assertDeprecation('Foo::bar() is deprecated. Do it this way instead.');
     }
 
-    public function testMethodSuggestClass()
+    public function testMethodSuggestClass(): void
     {
         TestDeprecatedClass::foo();
         $this->assertDeprecation(TestDeprecatedClass::class . '::foo() is deprecated. Use ArrayObject instead.');
     }
 
-    public function testMethodSuggestClassWithMatchingMethod()
+    public function testMethodSuggestClassWithMatchingMethod(): void
     {
         TestDeprecatedClass::getArrayCopy();
         $this->assertDeprecation(TestDeprecatedClass::class . '::getArrayCopy() is deprecated. Use ArrayObject::getArrayCopy() instead.');
     }
 
-    public function testMethodConstructor()
+    public function testMethodConstructor(): void
     {
         new TestDeprecatedClass(true);
         $this->assertDeprecation(TestDeprecatedClass::class . ' is deprecated. Use ArrayObject instead.');
     }
 
-    public function testMethodMagicCall()
+    public function testMethodMagicCall(): void
     {
         /* @noinspection PhpUndefinedMethodInspection */
         TestDeprecatedClass::magicStatic();
@@ -61,13 +63,13 @@ class DeprecatedTest extends TestCase
         $this->assertDeprecation(TestDeprecatedClass::class . '::append() is deprecated. Use ArrayObject::append() instead.');
     }
 
-    public function testMethodFunction()
+    public function testMethodFunction(): void
     {
         eval('namespace Bolt\Common { function deprecatedFunction() { Deprecated::method(); }; deprecatedFunction(); }');
         $this->assertDeprecation('Bolt\Common\deprecatedFunction() is deprecated.');
     }
 
-    public function testMethodIndex()
+    public function testMethodIndex(): void
     {
         TestDeprecatedClass::someMethod();
         $this->assertDeprecation(TestDeprecatedClass::class . '::someMethod() is deprecated. Use ArrayObject instead.');
@@ -77,7 +79,7 @@ class DeprecatedTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Expected a value greater than or equal to 0. Got: -1
      */
-    public function testMethodIndexNegative()
+    public function testMethodIndexNegative(): void
     {
         Deprecated::method(null, null, -1);
     }
@@ -86,7 +88,7 @@ class DeprecatedTest extends TestCase
      * @expectedException \OutOfBoundsException
      * @expectedExceptionMessage 9000 is greater than the current call stack
      */
-    public function testMethodIndexOutOfBounds()
+    public function testMethodIndexOutOfBounds(): void
     {
         Deprecated::method(null, null, 9000);
     }
@@ -95,7 +97,7 @@ class DeprecatedTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Expected a non-empty string. Got: boolean
      */
-    public function testMethodNotIntOrString()
+    public function testMethodNotIntOrString(): void
     {
         Deprecated::method(null, null, false);
     }
@@ -104,7 +106,7 @@ class DeprecatedTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Expected a non-empty string. Got: ""
      */
-    public function testMethodEmptyString()
+    public function testMethodEmptyString(): void
     {
         Deprecated::method(null, null, '');
     }
@@ -113,13 +115,13 @@ class DeprecatedTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Bolt\Common\Deprecated::method() must be called from within a function/method.
      */
-    public function testMethodNotFunction()
+    public function testMethodNotFunction(): void
     {
         // Using eval here because it is the easiest, but this also applies to require(_once)/include(_once)
         eval('\Bolt\Common\Deprecated::method();');
     }
 
-    public function testClass()
+    public function testClass(): void
     {
         Deprecated::cls('Foo\Bar');
         $this->assertDeprecation('Foo\Bar is deprecated.');
@@ -129,7 +131,7 @@ class DeprecatedTest extends TestCase
         $this->assertDeprecation('Foo\Bar is deprecated. Do it this way instead.');
     }
 
-    public function testWarn()
+    public function testWarn(): void
     {
         Deprecated::warn('Foo bar');
         $this->assertDeprecation('Foo bar is deprecated.');
@@ -145,32 +147,32 @@ class DeprecatedTest extends TestCase
         $this->assertDeprecation('Foo bar is deprecated since 3.0 and will be removed in 4.0. Use baz instead.');
     }
 
-    public function testRaw()
+    public function testRaw(): void
     {
         Deprecated::raw('Hello world.');
         $this->assertDeprecation('Hello world.');
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->deprecations = [];
         set_error_handler(
-            function ($type, $msg, $file, $line) {
+            function ($type, $msg, $file, $line): void {
                 $this->deprecations[] = $msg;
             },
             E_USER_DEPRECATED
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         restore_error_handler();
     }
 
-    private function assertDeprecation($msg)
+    private function assertDeprecation($msg): void
     {
         $this->assertNotEmpty($this->deprecations, 'No deprecations triggered.');
-        $this->assertEquals($msg, $this->deprecations[0]);
+        $this->assertSame($msg, $this->deprecations[0]);
         $this->deprecations = [];
     }
 }

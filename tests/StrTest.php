@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bolt\Common\Tests;
 
 use Bolt\Common\Str;
 
 class StrTest extends TestCase
 {
-    public function testReplaceFirst()
+    public function testReplaceFirst(): void
     {
         $this->assertSame(
             'HelloFooHelloGoodbye',
@@ -23,7 +25,7 @@ class StrTest extends TestCase
         );
     }
 
-    public function testReplaceLast()
+    public function testReplaceLast(): void
     {
         $this->assertSame(
             'HelloGoodbyeFooGoodbye',
@@ -40,7 +42,7 @@ class StrTest extends TestCase
         );
     }
 
-    public function testRemoveFirst()
+    public function testRemoveFirst(): void
     {
         $this->assertSame('HelloHelloGoodbye', Str::removeFirst('HelloGoodbyeHelloGoodbye', 'Goodbye'));
         $this->assertSame('HelloHelloGoodbye', Str::removeFirst('HelloGOODBYEHelloGoodbye', 'Goodbye', false));
@@ -48,7 +50,7 @@ class StrTest extends TestCase
         $this->assertSame('abc', Str::removeFirst('abc', 'zxc'));
     }
 
-    public function testRemoveLast()
+    public function testRemoveLast(): void
     {
         $this->assertSame('HelloGoodbyeGoodbye', Str::removeLast('HelloGoodbyeHelloGoodbye', 'Hello'));
         $this->assertSame('HelloGoodbyeGoodbye', Str::removeLast('HelloGoodbyeHELLOGoodbye', 'Hello', false));
@@ -56,7 +58,7 @@ class StrTest extends TestCase
         $this->assertSame('abc', Str::removeLast('abc', 'zxc'));
     }
 
-    public function testSplitFirst()
+    public function testSplitFirst(): void
     {
         $this->assertSame('herp', Str::splitFirst('herp derp foo bar', ' '));
         $this->assertSame('herp derp', Str::splitFirst('herp derp', ','));
@@ -65,12 +67,12 @@ class StrTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testSplitFirstEmptyDelimiter()
+    public function testSplitFirstEmptyDelimiter(): void
     {
         $this->assertFalse(Str::splitFirst('herp derp', ''));
     }
 
-    public function testSplitLast()
+    public function testSplitLast(): void
     {
         $this->assertSame('bar', Str::splitLast('herp derp foo bar', ' '));
         $this->assertSame('herp derp', Str::splitLast('herp derp', ','));
@@ -79,26 +81,26 @@ class StrTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testSplitLastEmptyDelimiter()
+    public function testSplitLastEmptyDelimiter(): void
     {
         $this->assertFalse(Str::splitLast('herp derp', ''));
     }
 
-    public function testEndsWith()
+    public function testEndsWith(): void
     {
         $this->assertTrue(Str::endsWith('FooBar', 'Bar'));
         $this->assertTrue(Str::endsWith('FooBar', 'bar', false));
         $this->assertFalse(Str::endsWith('FooBar', 'Foo'));
     }
 
-    public function testStartsWith()
+    public function testStartsWith(): void
     {
         $this->assertTrue(Str::startsWith('FooBar', 'Foo'));
         $this->assertTrue(Str::startsWith('FooBar', 'foo', false));
         $this->assertFalse(Str::startsWith('FooBar', 'Qux'));
     }
 
-    public function testEnsureEndsWith()
+    public function testEnsureEndsWith(): void
     {
         $this->assertsame('FooBar_', Str::ensureEndsWith('FooBar_', '_'));
         $this->assertsame('FooBar_', Str::ensureEndsWith('FooBar', '_'));
@@ -107,7 +109,7 @@ class StrTest extends TestCase
         $this->assertsame('FooBar', Str::ensureEndsWith('FooBar', 'FooBar'));
     }
 
-    public function testEnsureStartsWith()
+    public function testEnsureStartsWith(): void
     {
         $this->assertsame('_FooBar', Str::ensureStartsWith('FooBar', '_'));
         $this->assertsame('_FooBar', Str::ensureStartsWith('_FooBar', '_'));
@@ -116,13 +118,13 @@ class StrTest extends TestCase
         $this->assertsame('FooBar', Str::ensureStartsWith('FooBar', 'FooBar'));
     }
 
-    public function testClassName()
+    public function testClassName(): void
     {
         $this->assertSame('StrTest', Str::className($this));
         $this->assertSame('StrTest', Str::className(static::class));
     }
 
-    public function testCamelCase()
+    public function testCamelCase(): void
     {
         $this->assertSame('FooBar', Str::camelCase('fooBar'));
         $this->assertSame('FooBar', Str::camelCase('FooBar'));
@@ -131,21 +133,21 @@ class StrTest extends TestCase
         $this->assertSame('fooBar', Str::camelCase('foo_bar', true));
     }
 
-    public function testHumanize()
+    public function testHumanize(): void
     {
         $this->assertSame('Foo bar', Str::humanize('fooBar'));
         $this->assertSame('Foo bar', Str::humanize('FooBar'));
         $this->assertSame('Foo bar', Str::humanize('foo_bar'));
     }
 
-    public function testSnakeCase()
+    public function testSnakeCase(): void
     {
         $this->assertSame('foo_bar', Str::snakeCase('fooBar'));
         $this->assertSame('foo_bar', Str::snakeCase('FooBar'));
         $this->assertSame('foo_bar', Str::snakeCase('foo_bar'));
     }
 
-    public function testMbStrReplace()
+    public function testMbStrReplace(): void
     {
         $this->assertSame('fooXXX', Str::mb_substr_replace('fooBarQuxBzzzz', 'XXX', 3));
         $this->assertSame('fooXXXrQuxBzzzz', Str::mb_substr_replace('fooBarQuxBzzzz', 'XXX', 3, 2));
@@ -156,27 +158,39 @@ class StrTest extends TestCase
         $this->assertSame('foo💁‍♂️z', Str::mb_substr_replace('fooBarQuxBzzzz', '💁‍♂️', 3, 10));
     }
 
-    public function testPlaceholder()
+    public function testPlaceholder(): void
     {
         $this->assertSame(
             'You are the apple to my eye.',
-            Str::placeholders('You are the {FOO} to my {BAR}.', ['foo' => 'apple', 'bar' => 'eye'])
+            Str::placeholders('You are the {FOO} to my {BAR}.', [
+                'foo' => 'apple',
+                'bar' => 'eye',
+            ])
         );
         $this->assertSame(
             'You are the 🍏 to my 👁.',
-            Str::placeholders('You are the {FOO} to my {BAR}.', ['foo' => '🍏', 'bar' => '👁'])
+            Str::placeholders('You are the {FOO} to my {BAR}.', [
+                'foo' => '🍏',
+                'bar' => '👁',
+            ])
         );
         $this->assertSame(
             'You are the {foo} to my {bar}.',
-            Str::placeholders('You are the {foo} to my {bar}.', ['foo' => '🍏', 'bar' => '👁'])
+            Str::placeholders('You are the {foo} to my {bar}.', [
+                'foo' => '🍏',
+                'bar' => '👁',
+            ])
         );
         $this->assertSame(
             'You are the 🍏 to my 👁.',
-            Str::placeholders('You are the {foo} to my {bar}.', ['foo' => '🍏', 'bar' => '👁'], true)
+            Str::placeholders('You are the {foo} to my {bar}.', [
+                'foo' => '🍏',
+                'bar' => '👁',
+            ], true)
         );
     }
 
-    public function testTitleCase()
+    public function testTitleCase(): void
     {
         $this->assertSame(
             'You Are the Apple to My Eye.',
