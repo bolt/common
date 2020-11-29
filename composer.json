@@ -13,7 +13,7 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=7.2.5 || ^8.0",
         "seld/jsonlint": "^1.7",
         "webmozart/assert": "^1.6"
     },
