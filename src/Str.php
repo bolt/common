@@ -622,4 +622,15 @@ class Str
     {
         return trim(preg_replace('/[\t\n\r\s]+/', ' ', $str), $charlist);
     }
+    
+    /**
+     * Tests a string as a Regular Expression (regex)
+     * @return bool true if valid.
+     */
+    public static function isValidRegex(string $regex): bool
+    {
+        @preg_match($regex, '');
+
+        return preg_last_error() === PREG_NO_ERROR;
+    }
 }
