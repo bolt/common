@@ -623,7 +623,7 @@ class Str
         return trim(preg_replace('/[\t\n\r\s]+/', ' ', $str), $charlist);
     }
     
-        /**
+/**
      * Tests a string as a Regular Expression (regex)
      * @return bool true if valid.
      */
