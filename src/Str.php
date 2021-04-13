@@ -622,7 +622,7 @@ class Str
     {
         return trim(preg_replace('/[\t\n\r\s]+/', ' ', $str), $charlist);
     }
-    
+
     /**
      * Tests a string as a Regular Expression (regex)
      * @return bool true if valid.
@@ -632,5 +632,10 @@ class Str
         @preg_match($regex, '');
 
         return preg_last_error() === PREG_NO_ERROR;
+    }
+
+    public static function decode(string $str): string
+    {
+        return html_entity_decode($str);
     }
 }
