@@ -428,7 +428,7 @@ class Str
 
     public static function placeholders(string $string, array $replacements, bool $caseInsensitive = false): string
     {
-        $regex = '/{([A-Z0-9_]+)}/' . ($caseInsensitive ? 'i' : '');
+        $regex = '/([a-zA-Z0-9_.-]+)/' . ($caseInsensitive ? 'i' : '');
 
         return preg_replace_callback(
             $regex,
