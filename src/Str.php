@@ -633,6 +633,15 @@ class Str
 
         return preg_last_error() === PREG_NO_ERROR;
     }
+    
+    /**
+     * Converts an iterable into a string.
+     * @return string
+     */
+    public static function stringifyValue($value): string
+    {
+        return is_iterable($value) ? sprintf('[%s]', implode(',', $value)) : $value;
+    }
 
     public static function decode(string $str): string
     {
