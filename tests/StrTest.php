@@ -217,4 +217,44 @@ class StrTest extends TestCase
             Str::titleCase('Weird things happen with stand-in, or end in a')
         );
     }
+
+    public function testStringifyValue(): void
+    {
+        $this->assertSame(
+            '"foo"',
+            Str::stringifyValue('foo')
+        );
+        $this->assertSame(
+            '"9"',
+            Str::stringifyValue('9')
+        );
+        $this->assertSame(
+            '9',
+            Str::stringifyValue(9)
+        );
+        $this->assertSame(
+            'true',
+            Str::stringifyValue(true)
+        );
+        $this->assertSame(
+            'false',
+            Str::stringifyValue(false)
+        );
+        $this->assertSame(
+            'null',
+            Str::stringifyValue(null)
+        );
+        $this->assertSame(
+            '["a", "b"]',
+            Str::stringifyValue(['a', 'b'])
+        );
+        $this->assertSame(
+            '[]',
+            Str::stringifyValue([])
+        );
+        $this->assertSame(
+            '[true, 1, null]',
+            Str::stringifyValue([true, 1, null])
+        );
+    }
 }
