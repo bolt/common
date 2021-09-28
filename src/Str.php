@@ -625,6 +625,7 @@ class Str
 
     /**
      * Tests a string as a Regular Expression (regex)
+     *
      * @return bool true if valid.
      */
     public static function isValidRegex(string $regex): bool
@@ -636,11 +637,26 @@ class Str
 
     /**
      * Converts an iterable into a string.
-     * @return string
      */
     public static function stringifyValue($value): string
     {
-        return is_iterable($value) ? sprintf('[%s]', implode(',', $value)) : $value;
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+
+        if (is_int($value)) {
+            return (string) $value;
+        }
+
+        if ($value === null) {
+            return 'null';
+        }
+
+        if (is_iterable($value)) {
+            return '[' . implode(', ', array_map('self::stringifyValue', $value)) . ']';
+        }
+
+        return sprintf('"%s"', (string) $value);
     }
 
     public static function decode(string $str): string
