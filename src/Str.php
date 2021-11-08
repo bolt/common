@@ -257,7 +257,7 @@ class Str
     private static function getSlugify(): Slugify
     {
         if (self::$slugifyInstance === null) {
-            self::$slugifyInstance = Slugify::create();
+            self::$slugifyInstance = Slugify::create(['lowercase' => true]);
         }
 
         return self::$slugifyInstance;
